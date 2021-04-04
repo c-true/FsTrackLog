@@ -23,6 +23,7 @@ namespace FsTrackLog
     {
         private static AutoResetEvent _resetEvent = new AutoResetEvent(false);
         private static FileStream _fileStream;
+        private static FsTrackLogger _trackLogger;
         private static string _fileName;
         private static bool _displayCharStar = true;
         private static int _sampleCount = 0;
@@ -53,14 +54,13 @@ namespace FsTrackLog
                     if (!di.Exists)
                         throw new Exception("Could not find directory: " + options.Directory);
 
-                    _fileName = Path.Combine(options.Directory, GetFileName());
-                    _fileStream = new FileStream(_fileName, FileMode.Create, FileAccess.Write);
-                    _fileStream.Write(new []{FSTRACKLOG_BINARY_VERSION}, 0, 1);
-                    Console.WriteLine($"Writing binary Track Log to {_fileName}");
+                    _trackLogger = new FsTrackLogger(di.FullName);
+                    Console.WriteLine($"Writing binary Track Log to {_trackLogger.FileName}");
                 }
                 else if (!string.IsNullOrEmpty(options.FileName))
                 {
                     ConvertBinaryToGpx(options.FileName);
+
                     return;
                 }
 
@@ -118,6 +118,21 @@ namespace FsTrackLog
             _subject.OnCompleted();
         }
 
+        private static void ConvertBinaryToGpx(string fileName)
+        {
+            try
+            {
+                FsGpxWriter gpxWriter = new FsGpxWriter();
+                string gpxFileName = Path.Combine(Path.GetDirectoryName(fileName), Path.GetFileNameWithoutExtension(fileName) + ".gpx");
+            
+                gpxWriter.ConvertBinaryToGpx(fileName, gpxFileName);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("An error occurred while creating GPX file: " + e.Message + "\n\n" + e.ToString());
+            }
+        }
+
         static void WriteSequenceToConsole(IObservable<AircraftInfo> sequence)
         {
             sequence.Subscribe(value =>
@@ -141,112 +156,18 @@ namespace FsTrackLog
                     _displayCharStar = !_displayCharStar;
                 }
 
-                byte[] byteArray = GetAircraftInfoBytes(value);
-                _fileStream.Write(byteArray, 0, byteArray.Length);
+                _trackLogger.LogTrackPoint(value);
                 _sampleCount++;
             }, () =>
             {
                 Console.WriteLine($"\rCompleted. {_sampleCount} track points written to {_fileName}");
-                _fileStream?.Flush(true);
-                _fileStream?.Close(); 
+                _trackLogger.Close();
 
-                if(_fileStream != null && options.GenerateGpx)
-                    ConvertBinaryToGpx(_fileStream.Name);
+                if(_trackLogger != null && options.GenerateGpx)
+                    ConvertBinaryToGpx(_trackLogger.FileName);
             });
         }
 
-        private static byte[] GetAircraftInfoBytes(AircraftInfo value)
-        {
-            List<byte> byteArray = new List<byte>();
-
-            DateTime utcTime = GetDateTime(value.ZuluYear, value.ZuluDayOfYear, value.ZuluTime);
-            byteArray.AddRange(BitConverter.GetBytes(utcTime.ToBinary()));
-            byteArray.AddRange(BitConverter.GetBytes(value.Latitude));
-            byteArray.AddRange(BitConverter.GetBytes(value.Longitude));
-            byteArray.AddRange(BitConverter.GetBytes(value.Altitude));
-            byteArray.AddRange(BitConverter.GetBytes(value.AltitudeAboveGround));
-            byteArray.AddRange(BitConverter.GetBytes(value.Heading));
-            byteArray.AddRange(BitConverter.GetBytes(value.Speed));
-
-            return byteArray.ToArray();
-        }
-
-        private static void ConvertBinaryToGpx(string fileName)
-        {
-            Console.WriteLine($"Converting binary Track Log to GPX.");
-
-            GpxWriter gpxWriter = null;
-            string gpxFileName = null;
-            int numberOfTrackPoint = 0;
-
-            try
-            {
-                gpxFileName =  Path.Combine(Path.GetDirectoryName(fileName), Path.GetFileNameWithoutExtension(fileName) + ".gpx");
-                gpxWriter = new SpatialLite.Gps.IO.GpxWriter(new FileStream(gpxFileName, FileMode.Create, FileAccess.Write), new GpxWriterSettings()
-                {
-                    GeneratorName = "FS TrackLog",
-                    IsReadOnly = false,
-                    WriteMetadata = false
-                });
-
-                gpxWriter.WriteTrackStart();
-
-                bool quit = false;
-                FileStream fileStream = new FileStream(fileName, FileMode.Open, FileAccess.Read);
-
-                int fsTrackLogBinaryVersion = fileStream.ReadByte();
-                Console.WriteLine("Reading binary file, version: " + fsTrackLogBinaryVersion);
-                
-                if(fsTrackLogBinaryVersion != FSTRACKLOG_BINARY_VERSION)
-                    Console.WriteLine("Warning: Not a current version, there may be issues reading this older file format");
-
-                byte[] aircraftInfoBuffer = new byte[SIZE_AIRCRAFT_INFO];
-                while (!quit)
-                {
-                    int res = fileStream.Read(aircraftInfoBuffer, 0, SIZE_AIRCRAFT_INFO);
-
-                    if (res == SIZE_AIRCRAFT_INFO)
-                    {
-                        AircraftInfo aircraftInfo = new AircraftInfo();
-
-                        long dateData = BitConverter.ToInt64(aircraftInfoBuffer, 0);
-                        aircraftInfo.Latitude = BitConverter.ToDouble(aircraftInfoBuffer, 8);
-                        aircraftInfo.Longitude = BitConverter.ToDouble(aircraftInfoBuffer, 16);
-                        aircraftInfo.Altitude = BitConverter.ToDouble(aircraftInfoBuffer, 24);
-                        aircraftInfo.AltitudeAboveGround = BitConverter.ToDouble(aircraftInfoBuffer, 32);
-                        aircraftInfo.Heading = BitConverter.ToDouble(aircraftInfoBuffer, 40);
-                        aircraftInfo.Speed = BitConverter.ToDouble(aircraftInfoBuffer, 48);
-
-                        DateTime utcTime = DateTime.FromBinary(dateData);
-                        Console.WriteLine($"{utcTime} - {aircraftInfo.Latitude:F6} - {aircraftInfo.Longitude:F6} - {aircraftInfo.Altitude:F2} - {aircraftInfo.AltitudeAboveGround:F2}");
-                        
-                        gpxWriter.WriteTrackPoint(new GpxPoint(aircraftInfo.Longitude, aircraftInfo.Latitude, aircraftInfo.Altitude, utcTime));
-                        numberOfTrackPoint++;
-                    }
-                    else
-                        quit = true;
-                }
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine("An error occurred while writing binary track point to GPX file: " + e);
-            }
-
-            try
-            {
-                if(gpxWriter != null)
-                {
-                    gpxWriter.WriteTrackEnd();
-                    gpxWriter.Dispose();
-                    if(!string.IsNullOrEmpty(gpxFileName))
-                        Console.WriteLine($"{numberOfTrackPoint} track points written to GPX file at '{gpxFileName}'.");
-                }
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine("Could not close GPX file. It is probably invalid. Message: " + e.Message);
-            }
-        }
 
         private static string GetFileName()
         {
@@ -287,7 +208,7 @@ namespace FsTrackLog
                 {
                     //configure help
                     h.AdditionalNewLineAfterOption = false;
-                    h.Heading = "Flight Simulator Track Log";
+                    h.Heading = "Flight Simulator Track Log v1.0.1";
                     h.Copyright = "";
                     return HelpText.DefaultParsingErrorsHandler(result, h);
                 }, e => e);

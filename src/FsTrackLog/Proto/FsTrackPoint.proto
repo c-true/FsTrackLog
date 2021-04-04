@@ -1,0 +1,20 @@
+﻿syntax = "proto3";  
+option csharp_namespace = "FsTrackLog.Proto.Generated";  
+
+
+
+message FsTrackLogHeader
+{
+    int32 Version = 1;
+}
+
+message FsTrackPoint  
+{  
+	int64 Time = 1;  
+    double Latitude = 2;  
+    double Longitude = 3;  
+    double Altitude = 4;
+	double AltitudeAboveGround = 5;
+    double Heading = 6;
+    double Speed = 7;
+}
