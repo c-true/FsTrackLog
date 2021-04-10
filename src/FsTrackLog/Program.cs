@@ -22,14 +22,13 @@ namespace FsTrackLog
     class Program
     {
         private static AutoResetEvent _resetEvent = new AutoResetEvent(false);
-        private static FileStream _fileStream;
+
         private static FsTrackLogger _trackLogger;
         private static string _fileName;
         private static bool _displayCharStar = true;
         private static int _sampleCount = 0;
 
         private const byte FSTRACKLOG_BINARY_VERSION = 0x01;
-        private const int SIZE_AIRCRAFT_INFO = 56; // Size of aircraft binary data, not including the version header
 
         static void Main(string[] args)
         {
@@ -168,31 +167,20 @@ namespace FsTrackLog
             });
         }
 
-
-        private static string GetFileName()
-        {
-            return $"FsTrackLog_{DateTime.Now.ToString("yyyyMMddhhmmss")}.fst";
-        }
-
-        private static DateTime GetDateTime(ulong year, ulong dayInYear, ulong secondsInDay)
-        {
-            return new DateTime((int)year, 1, 1).AddDays(dayInYear).AddSeconds(secondsInDay);
-        }
-
         private static void InitializeFlightSimulator(FsConnect fsConnect)
         {
-            List<SimProperty> definition = new List<SimProperty>();
+            List<SimVar> definition = new List<SimVar>();
 
-            definition.Add(new SimProperty(FsSimVar.ZuluYear, FsUnit.Number, SIMCONNECT_DATATYPE.INT64));
-            definition.Add(new SimProperty(FsSimVar.ZuluDayOfYear, FsUnit.Number, SIMCONNECT_DATATYPE.INT64));
-            definition.Add(new SimProperty(FsSimVar.ZuluTime, FsUnit.Seconds, SIMCONNECT_DATATYPE.INT64));
-            definition.Add(new SimProperty(FsSimVar.PlaneLatitude, FsUnit.Degree, SIMCONNECT_DATATYPE.FLOAT64));
-            definition.Add(new SimProperty(FsSimVar.PlaneLongitude, FsUnit.Degree, SIMCONNECT_DATATYPE.FLOAT64));
-            definition.Add(new SimProperty(FsSimVar.PlaneAltitudeAboveGround, FsUnit.Meter, SIMCONNECT_DATATYPE.FLOAT64));
-            definition.Add(new SimProperty(FsSimVar.PlaneAltitude, FsUnit.Meter, SIMCONNECT_DATATYPE.FLOAT64));
-            definition.Add(new SimProperty(FsSimVar.PlaneHeadingDegreesTrue, FsUnit.Degrees, SIMCONNECT_DATATYPE.FLOAT64));
-            definition.Add(new SimProperty(FsSimVar.AirspeedTrue, FsUnit.MeterPerSecond, SIMCONNECT_DATATYPE.FLOAT64));
-            definition.Add(new SimProperty(FsSimVar.SimOnGround, FsUnit.Boolean, SIMCONNECT_DATATYPE.INT32));
+            definition.Add(new SimVar(FsSimVar.ZuluYear, FsUnit.Number, SIMCONNECT_DATATYPE.INT64));
+            definition.Add(new SimVar(FsSimVar.ZuluDayOfYear, FsUnit.Number, SIMCONNECT_DATATYPE.INT64));
+            definition.Add(new SimVar(FsSimVar.ZuluTime, FsUnit.Seconds, SIMCONNECT_DATATYPE.INT64));
+            definition.Add(new SimVar(FsSimVar.PlaneLatitude, FsUnit.Degree, SIMCONNECT_DATATYPE.FLOAT64));
+            definition.Add(new SimVar(FsSimVar.PlaneLongitude, FsUnit.Degree, SIMCONNECT_DATATYPE.FLOAT64));
+            definition.Add(new SimVar(FsSimVar.PlaneAltitudeAboveGround, FsUnit.Meter, SIMCONNECT_DATATYPE.FLOAT64));
+            definition.Add(new SimVar(FsSimVar.PlaneAltitude, FsUnit.Meter, SIMCONNECT_DATATYPE.FLOAT64));
+            definition.Add(new SimVar(FsSimVar.PlaneHeadingDegreesTrue, FsUnit.Degrees, SIMCONNECT_DATATYPE.FLOAT64));
+            definition.Add(new SimVar(FsSimVar.AirspeedTrue, FsUnit.MeterPerSecond, SIMCONNECT_DATATYPE.FLOAT64));
+            definition.Add(new SimVar(FsSimVar.SimOnGround, FsUnit.Boolean, SIMCONNECT_DATATYPE.INT32));
 
             fsConnect.RegisterDataDefinition<AircraftInfo>(FsDefinitions.AircraftInfo, definition);
         }
