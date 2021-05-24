@@ -1,4 +1,4 @@
-﻿namespace FsTrackLog
+﻿namespace CTrue.Fs.FlightData.Provider
 {
     public enum FsDefinitions
     {

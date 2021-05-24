@@ -11,6 +11,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using CommandLine;
 using CommandLine.Text;
+using CTrue.Fs.FlightData.Contracts;
+using CTrue.Fs.FlightData.Provider;
+using CTrue.Fs.FlightData.Store;
 using CTrue.FsConnect;
 using CTrue.FsConnect.Managers;
 using Microsoft.FlightSimulator.SimConnect;
@@ -43,18 +46,14 @@ namespace FsTrackLog
         private static void Run(Options options)
         {
             Subject<AircraftInfo> _subject = new Subject<AircraftInfo>();
+            FlightDataProvider _provider = new FlightDataProvider(_subject);
+            FlightDataStore _store = new FlightDataStore();
 
             try
             {
                 if (!string.IsNullOrEmpty(options.Directory))
                 {
-                    DirectoryInfo di = new DirectoryInfo(options.Directory);
-
-                    if (!di.Exists)
-                        throw new Exception("Could not find directory: " + options.Directory);
-
-                    _trackLogger = new FsTrackLogger(di.FullName);
-                    Console.WriteLine($"Writing binary Track Log to {_trackLogger.FileName}");
+                    _store.Initialize(options.Directory);
                 }
                 else if (!string.IsNullOrEmpty(options.FileName))
                 {
@@ -63,39 +62,21 @@ namespace FsTrackLog
                     return;
                 }
 
+                //
+                // Set up subscribers
+                //
                 if(options.Verbose)
                     WriteSequenceToConsole(_subject);
 
-                WriteSequenceToFile(_subject, options);
+                _subject.Subscribe(_store.Write, _store.Close);
 
+                //
+                // Start Flight Data Provider
+                // 
 
-                FsConnect fsConnect = new FsConnect();
-                fsConnect.SimConnectFileLocation = SimConnectFileLocation.MyDocuments;
-                fsConnect.ConnectionChanged += (sender, args) =>
-                {
-                    if(args)
-                    {
-                        InitializeFlightSimulator(fsConnect);
-                        _resetEvent.Set();
-                    }
-                };
-
-                fsConnect.Connect("FS Track Log", options.Hostname, options.Port, SimConnectProtocol.Ipv4);
-
-                bool success = _resetEvent.WaitOne(2000);
-
-                if (!success)
-                {
-                    Console.WriteLine($"Could not connect to {options.Hostname}:{options.Port}.");
-                    return;
-                }
-                else
-                    Console.WriteLine("Connected to Flight Simulator");
-
-                AircraftManager<AircraftInfo> aircraftManager =
-                    new AircraftManager<AircraftInfo>(fsConnect, FsDefinitions.AircraftInfo, FsRequests.AircraftPeriodic);
-                aircraftManager.Updated += (sender, args) => { _subject.OnNext(args.AircraftInfo); };
-                aircraftManager.RequestMethod = RequestMethod.Continuously;
+                _provider.HostName = options.Hostname;
+                _provider.Port = options.Port;
+                _provider.Start();
 
                 ConsoleKeyInfo cki;
 
@@ -115,20 +96,25 @@ namespace FsTrackLog
             }
             
             _subject.OnCompleted();
-        }
 
-        private static void ConvertBinaryToGpx(string fileName)
-        {
-            try
+            if (options.GenerateGpx)
             {
-                FsGpxWriter gpxWriter = new FsGpxWriter();
-                string gpxFileName = Path.Combine(Path.GetDirectoryName(fileName), Path.GetFileNameWithoutExtension(fileName) + ".gpx");
-            
-                gpxWriter.ConvertBinaryToGpx(fileName, gpxFileName);
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine("An error occurred while creating GPX file: " + e.Message + "\n\n" + e.ToString());
+                DirectoryInfo di = new DirectoryInfo(options.Directory);
+                foreach (var fi in di.EnumerateFiles("*.fst"))
+                {
+                    try
+                    {
+                        string baseName = Path.GetFileNameWithoutExtension(fi.FullName);
+                        string gpxFileName = Path.Combine(fi.DirectoryName, baseName + ".gpx");
+
+                        if(!File.Exists(gpxFileName))
+                            ConvertBinaryToGpx(fi.FullName);
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine($"Could not convert file: '{fi.FullName}': " + e.Message);
+                    }
+                }
             }
         }
 
@@ -143,46 +129,19 @@ namespace FsTrackLog
             });
         }
 
-        static void WriteSequenceToFile(IObservable<AircraftInfo> sequence, Options options)
+        private static void ConvertBinaryToGpx(string fileName)
         {
-            sequence.Subscribe(value =>
+            try
             {
-                if (value.SimOnGround) return;
+                FsGpxWriter gpxWriter = new FsGpxWriter();
+                string gpxFileName = Path.Combine(Path.GetDirectoryName(fileName), Path.GetFileNameWithoutExtension(fileName) + ".gpx");
 
-                if(!options.Verbose)
-                {
-                    Console.Write("\r{0}", _displayCharStar ? "+" : "-");
-                    _displayCharStar = !_displayCharStar;
-                }
-
-                _trackLogger.LogTrackPoint(value);
-                _sampleCount++;
-            }, () =>
+                gpxWriter.ConvertBinaryToGpx(fileName, gpxFileName);
+            }
+            catch (Exception e)
             {
-                Console.WriteLine($"\rCompleted. {_sampleCount} track points written to {_fileName}");
-                _trackLogger.Close();
-
-                if(_trackLogger != null && options.GenerateGpx)
-                    ConvertBinaryToGpx(_trackLogger.FileName);
-            });
-        }
-
-        private static void InitializeFlightSimulator(FsConnect fsConnect)
-        {
-            List<SimVar> definition = new List<SimVar>();
-
-            definition.Add(new SimVar(FsSimVar.ZuluYear, FsUnit.Number, SIMCONNECT_DATATYPE.INT64));
-            definition.Add(new SimVar(FsSimVar.ZuluDayOfYear, FsUnit.Number, SIMCONNECT_DATATYPE.INT64));
-            definition.Add(new SimVar(FsSimVar.ZuluTime, FsUnit.Seconds, SIMCONNECT_DATATYPE.INT64));
-            definition.Add(new SimVar(FsSimVar.PlaneLatitude, FsUnit.Degree, SIMCONNECT_DATATYPE.FLOAT64));
-            definition.Add(new SimVar(FsSimVar.PlaneLongitude, FsUnit.Degree, SIMCONNECT_DATATYPE.FLOAT64));
-            definition.Add(new SimVar(FsSimVar.PlaneAltitudeAboveGround, FsUnit.Meter, SIMCONNECT_DATATYPE.FLOAT64));
-            definition.Add(new SimVar(FsSimVar.PlaneAltitude, FsUnit.Meter, SIMCONNECT_DATATYPE.FLOAT64));
-            definition.Add(new SimVar(FsSimVar.PlaneHeadingDegreesTrue, FsUnit.Degrees, SIMCONNECT_DATATYPE.FLOAT64));
-            definition.Add(new SimVar(FsSimVar.AirspeedTrue, FsUnit.MeterPerSecond, SIMCONNECT_DATATYPE.FLOAT64));
-            definition.Add(new SimVar(FsSimVar.SimOnGround, FsUnit.Boolean, SIMCONNECT_DATATYPE.INT32));
-
-            fsConnect.RegisterDataDefinition<AircraftInfo>(FsDefinitions.AircraftInfo, definition);
+                Console.WriteLine("An error occurred while creating GPX file: " + e.Message + "\n\n" + e.ToString());
+            }
         }
 
         static void DisplayHelp<T>(ParserResult<T> result, IEnumerable<Error> errs)

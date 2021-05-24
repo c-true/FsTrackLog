@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using CTrue.Fs.FlightData.Store;
 using FsTrackLog.Proto.Generated;
 using SpatialLite.Gps.Geometries;
 using SpatialLite.Gps.IO;

@@ -1,5 +1,7 @@
 ﻿using System;
 using System.IO;
+using CTrue.Fs.FlightData.Contracts;
+using CTrue.Fs.FlightData.Store;
 using CTrue.FsTrackLog.Test.Resources;
 using FsTrackLog;
 using NUnit.Framework;
@@ -27,9 +29,7 @@ namespace CTrue.FsTrackLog.Test
                 Heading = 10,
                 Speed = 20,
                 SimOnGround = false,
-                ZuluYear = 2021,
-                ZuluDayOfYear = 10,
-                ZuluTime = 1000
+                TimeStamp = new DateTime(2021, 1, 11, 0, 16, 40)
             });
 
             //writer.Close();

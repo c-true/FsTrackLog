@@ -10,7 +10,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		..\README.md = ..\README.md
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CTrue.FsTrackLog.Test", "CTrue.FsTrackLog.Test\CTrue.FsTrackLog.Test.csproj", "{28592B34-85BF-4DF5-BED0-0836B350D726}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CTrue.FsTrackLog.Test", "CTrue.FsTrackLog.Test\CTrue.FsTrackLog.Test.csproj", "{28592B34-85BF-4DF5-BED0-0836B350D726}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CTrue.Fs.FlightData.Provider", "CTrue.Fs.FlightDataRecorder\CTrue.Fs.FlightData.Provider.csproj", "{A34075FE-66C1-4BF3-A06C-342D221D1A87}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CTrue.Fs.FlightData.Store", "CTrue.Fs.FlightDataStore\CTrue.Fs.FlightData.Store.csproj", "{D2CDA0ED-BDBB-4E19-932E-749FB7D017AD}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CTrue.Fs.FlightData.Contracts", "CTrue.FlightData.Contracts\CTrue.Fs.FlightData.Contracts.csproj", "{0F96DC6C-D27D-49AF-B37E-938E7F877239}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -26,6 +32,18 @@ Global
 		{28592B34-85BF-4DF5-BED0-0836B350D726}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{28592B34-85BF-4DF5-BED0-0836B350D726}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{28592B34-85BF-4DF5-BED0-0836B350D726}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A34075FE-66C1-4BF3-A06C-342D221D1A87}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A34075FE-66C1-4BF3-A06C-342D221D1A87}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A34075FE-66C1-4BF3-A06C-342D221D1A87}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A34075FE-66C1-4BF3-A06C-342D221D1A87}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D2CDA0ED-BDBB-4E19-932E-749FB7D017AD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D2CDA0ED-BDBB-4E19-932E-749FB7D017AD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D2CDA0ED-BDBB-4E19-932E-749FB7D017AD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D2CDA0ED-BDBB-4E19-932E-749FB7D017AD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0F96DC6C-D27D-49AF-B37E-938E7F877239}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0F96DC6C-D27D-49AF-B37E-938E7F877239}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0F96DC6C-D27D-49AF-B37E-938E7F877239}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0F96DC6C-D27D-49AF-B37E-938E7F877239}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

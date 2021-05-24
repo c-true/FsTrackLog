@@ -1,11 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Runtime.InteropServices;
+using CTrue.Fs.FlightData.Contracts;
 using FsTrackLog.Proto.Generated;
 using Google.Protobuf;
 
-namespace FsTrackLog
+namespace CTrue.Fs.FlightData.Store
 {
     public class FsTrackLogger
     {
@@ -50,8 +49,7 @@ namespace FsTrackLog
             _stream?.Flush();
             _stream?.Close();
         }
-
-
+        
 
         public void LogTrackPoint(AircraftInfo value)
         {
@@ -68,9 +66,7 @@ namespace FsTrackLog
         {
             FsTrackPoint tp = new FsTrackPoint();
 
-            DateTime utcTime = GetDateTime(value.ZuluYear, value.ZuluDayOfYear, value.ZuluTime);
-
-            tp.Time = utcTime.ToBinary();
+            tp.Time = value.TimeStamp.ToBinary();
             tp.Latitude = value.Latitude;
             tp.Longitude = value.Longitude;
             tp.Altitude = value.Altitude;
@@ -79,11 +75,6 @@ namespace FsTrackLog
             tp.Speed = value.Speed;
 
             return tp;
-        }
-
-        private static DateTime GetDateTime(ulong year, ulong dayInYear, ulong secondsInDay)
-        {
-            return new DateTime((int)year, 1, 1).AddDays(dayInYear).AddSeconds(secondsInDay);
         }
     }
 }

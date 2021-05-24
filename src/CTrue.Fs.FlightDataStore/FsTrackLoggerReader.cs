@@ -1,8 +1,7 @@
 ﻿using System.IO;
-using System.Runtime.InteropServices;
 using FsTrackLog.Proto.Generated;
 
-namespace FsTrackLog
+namespace CTrue.Fs.FlightData.Store
 {
     public class FsTrackLoggerReader
     {
