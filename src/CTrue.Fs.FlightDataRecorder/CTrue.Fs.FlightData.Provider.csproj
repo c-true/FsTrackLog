@@ -6,8 +6,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="CTrue.FsConnect" Version="1.3.2" />
-    <PackageReference Include="CTrue.FsConnect.Managers" Version="1.3.0" />
+    <PackageReference Include="CTrue.FsConnect" Version="1.3.3" />
+    <PackageReference Include="CTrue.FsConnect.Managers" Version="1.3.3" />
     <PackageReference Include="System.Reactive" Version="5.0.0" />
   </ItemGroup>
 
