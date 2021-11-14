@@ -42,6 +42,7 @@ namespace CTrue.Fs.FlightData.Store
             };
 
             header.WriteDelimitedTo(_stream);
+			
         }
 
         public void Close()

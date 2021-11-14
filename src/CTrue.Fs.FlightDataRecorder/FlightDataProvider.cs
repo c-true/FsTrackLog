@@ -11,15 +11,15 @@ namespace CTrue.Fs.FlightData.Provider
     {
         private static AutoResetEvent _resetEvent = new AutoResetEvent(false);
         private FsConnect.FsConnect _fsConnect;
-        private readonly Subject<AircraftInfo> _subject;
+
+        public event EventHandler<AircraftDataReceivedEventArgs> AircraftDataReceived;
 
         public string HostName { get; set; }
 
         public uint Port { get; set; }
 
-        public FlightDataProvider(Subject<AircraftInfo> subject)
+        public FlightDataProvider()
         {
-            _subject = subject;
         }
 
         public void Start()
@@ -54,7 +54,9 @@ namespace CTrue.Fs.FlightData.Provider
             aircraftManager.RequestMethod = RequestMethod.Continuously;
             aircraftManager.Updated += (sender, args) =>
             {
-                _subject.OnNext(ConvertToDataFormat(args.AircraftInfo));
+                var aircraftInfo = ConvertToDataFormat(args.AircraftInfo);
+
+                AircraftDataReceived?.Invoke(this, new AircraftDataReceivedEventArgs(aircraftInfo));
             };
         }
 

@@ -1,5 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Diagnostics.Eventing.Reader;
+using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
@@ -12,12 +14,30 @@ namespace FsTrackLogApp
 {
     public class MainWindowViewModel : INotifyPropertyChanged
     {
-        private Subject<AircraftInfo> _subject;
         private FlightDataProvider _provider;
         private FlightDataStore _store;
+        private IObservable<AircraftInfo> _aircraftInfoObservable;
+
+        private bool _connected = false;
+        private bool _started = false;
+
         private string _status;
+        private string _startStopButtonText = "START";
+        private string _connectButtonText;
 
         public ICommand ConnectCommand { get; }
+        public ICommand StartStopCommand { get; }
+
+        public string StartStopButtonText
+        {
+            get => _startStopButtonText;
+            set
+            {
+                if (value == _startStopButtonText) return;
+                _startStopButtonText = value;
+                OnPropertyChanged();
+            }
+        }
 
         public string Status
         {
@@ -30,26 +50,56 @@ namespace FsTrackLogApp
             }
         }
 
+        public string ConnectButtonText
+        {
+            get => _connectButtonText;
+            set
+            {
+                if (value == _connectButtonText) return;
+                _connectButtonText = value;
+                OnPropertyChanged();
+            }
+        }
+
         public MainWindowViewModel()
         {
-            _subject = new Subject<AircraftInfo>();
-            _provider = new FlightDataProvider(_subject);
+            _provider = new FlightDataProvider();
             _store = new FlightDataStore();
 
+            ConnectButtonText = "CONNECT";
+            StartStopButtonText = "START";
             ConnectCommand = new DelegateCommand<object>(Connect, CanConnect);
+            StartStopCommand = new DelegateCommand<object>(StartStop, CanStartStop);
 
-            WriteSequenceToView(_subject);
+            _aircraftInfoObservable = Observable.FromEventPattern<EventHandler<AircraftDataReceivedEventArgs>, AircraftDataReceivedEventArgs>(
+                    h => _provider.AircraftDataReceived += h,
+                    h => _provider.AircraftDataReceived -= h)
+                .Select(k => k.EventArgs.AircraftInfo);
+
+            WriteSequenceToView(_aircraftInfoObservable);
         }
 
         private void Connect(object obj)
         {
             try
             {
-                _provider.HostName = "192.168.1.174";
-                _provider.Port = 57490;
-                _provider.Start();
+                if (_connected)
+                {
+                    ConnectButtonText = "CONNECT";
+                    _provider.Stop();
+                    _connected = false;
+                }
+                else
+                {
+                    _provider.HostName = "192.168.1.174";
+                    _provider.Port = 57490;
+                    _provider.Start();
 
-                Status = "Connected";
+                    Status = "Connected";
+                    ConnectButtonText = "DISCONNECT";
+                    _connected = true;
+                    ((DelegateCommand<object>)StartStopCommand).RaiseCanExecuteChanged();
+                }
             }
             catch (Exception e)
             {
@@ -62,9 +112,31 @@ namespace FsTrackLogApp
             return true;
         }
 
+        private void StartStop(object obj)
+        {
+            if (!_started)
+            {
+                StartStopButtonText = "STOP";
+                _store.Initialize("c:\\temp\\FsTrackLog");
+                _aircraftInfoObservable.Subscribe(_store.Write, _store.Close);
+                _started = true;
+            }
+            else
+            {
+                StartStopButtonText = "START";
+                _store.Close();
+                _started = false;
+            }
+        }
+
+        private bool CanStartStop(object arg)
+        {
+            return _connected;
+        }
+
         void WriteSequenceToView(IObservable<AircraftInfo> sequence)
         {
-            sequence.Subscribe(value =>
+            sequence.Sample(TimeSpan.FromSeconds(10)).Subscribe(value =>
             {
                 Status = $"({value.Latitude:F3}, {value.Longitude:F3}), Elev: {value.Altitude:F0}m, On ground: {value.SimOnGround}";
             }, () =>

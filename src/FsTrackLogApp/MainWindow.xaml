@@ -1,20 +1,43 @@
 ﻿<Window x:Class="FsTrackLogApp.MainWindow"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:FsTrackLogApp"
-        mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:FsTrackLogApp"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    Title="MainWindow"
+    Width="800"
+    Height="450"
+    mc:Ignorable="d">
     <Window.DataContext>
-        <local:MainWindowViewModel/>
+        <local:MainWindowViewModel />
     </Window.DataContext>
+    <Window.Resources>
+        <Style x:Key="MyBtnStyle" TargetType="{x:Type Button}">
+            <Setter Property="Margin" Value="2" />
+        </Style>
+    </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"></RowDefinition>
-            <RowDefinition Height="*"></RowDefinition>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <Button Command="{Binding ConnectCommand}" Content="CONNECT" />
-        <TextBlock Grid.Row="1" Text="{Binding Status}" />
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="100" />
+            <ColumnDefinition Width="20" />
+            <ColumnDefinition />
+        </Grid.ColumnDefinitions>
+        <Button
+            Command="{Binding ConnectCommand}"
+            Content="{Binding ConnectButtonText}"
+            Style="{StaticResource MyBtnStyle}" />
+        <Button Grid.Row="1"
+            Command="{Binding StartStopCommand}"
+            Content="{Binding StartStopButtonText}"
+            Style="{StaticResource MyBtnStyle}" />
+        
+        <TextBlock
+            Grid.Row="0"
+            Grid.Column="2"
+            Text="{Binding Status}" />
     </Grid>
 </Window>

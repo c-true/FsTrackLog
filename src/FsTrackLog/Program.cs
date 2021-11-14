@@ -4,6 +4,7 @@ using System.Data;
 using System.IO;
 using System.Linq;
 using System.Reactive.Disposables;
+using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Runtime.Remoting.Channels;
 using System.Text;
@@ -45,8 +46,8 @@ namespace FsTrackLog
 
         private static void Run(Options options)
         {
-            Subject<AircraftInfo> _subject = new Subject<AircraftInfo>();
-            FlightDataProvider _provider = new FlightDataProvider(_subject);
+            IObservable<AircraftInfo> _aircraftInfoObservable;
+            FlightDataProvider _provider = new FlightDataProvider();
             FlightDataStore _store = new FlightDataStore();
 
             try
@@ -65,10 +66,17 @@ namespace FsTrackLog
                 //
                 // Set up subscribers
                 //
-                if(options.Verbose)
-                    WriteSequenceToConsole(_subject);
 
-                _subject.Subscribe(_store.Write, _store.Close);
+
+                _aircraftInfoObservable = Observable.FromEventPattern<EventHandler<AircraftDataReceivedEventArgs>, AircraftDataReceivedEventArgs>(
+                        h => _provider.AircraftDataReceived += h,
+                        h => _provider.AircraftDataReceived -= h)
+                    .Select(k => k.EventArgs.AircraftInfo);
+
+                if (options.Verbose)
+                    WriteSequenceToConsole(_aircraftInfoObservable);
+
+                _aircraftInfoObservable.Subscribe(_store.Write, _store.Close);
 
                 //
                 // Start Flight Data Provider
@@ -94,8 +102,6 @@ namespace FsTrackLog
             {
                 Console.WriteLine("An error occurred: " + e.Message, e);    
             }
-            
-            _subject.OnCompleted();
 
             if (options.GenerateGpx)
             {
