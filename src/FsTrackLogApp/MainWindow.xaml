@@ -4,8 +4,8 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:FsTrackLogApp"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    Title="MainWindow"
-    Width="800"
+    Title="Flight Simulator Track Log"
+    Width="400"
     Height="450"
     mc:Ignorable="d">
     <Window.DataContext>
@@ -17,27 +17,38 @@
         </Style>
     </Window.Resources>
     <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-        </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="100" />
             <ColumnDefinition Width="20" />
             <ColumnDefinition />
         </Grid.ColumnDefinitions>
-        <Button
-            Command="{Binding ConnectCommand}"
-            Content="{Binding ConnectButtonText}"
-            Style="{StaticResource MyBtnStyle}" />
-        <Button Grid.Row="1"
-            Command="{Binding StartStopCommand}"
-            Content="{Binding StartStopButtonText}"
-            Style="{StaticResource MyBtnStyle}" />
-        
-        <TextBlock
-            Grid.Row="0"
-            Grid.Column="2"
-            Text="{Binding Status}" />
+        <StackPanel>
+            <Button
+                Width="80"
+                Command="{Binding StartStopCommand}"
+                Content="{Binding StartStopButtonText}"
+                Style="{StaticResource MyBtnStyle}" />
+        </StackPanel>
+
+        <StackPanel Grid.Column="2">
+            <Button
+                Width="80"
+                HorizontalAlignment="Right"
+                Command="{Binding ConnectCommand}"
+                Content="{Binding ConnectButtonText}"
+                Style="{StaticResource MyBtnStyle}" />
+
+            <TextBlock
+                Grid.Row="0"
+                Grid.Column="2"
+                Text="{Binding Status}" />
+
+            <local:AircraftInfoView
+                Grid.Row="1"
+                Grid.Column="2"
+                Margin="5"
+                DataContext="{Binding AircraftInfo}" />
+        </StackPanel>
+
     </Grid>
 </Window>

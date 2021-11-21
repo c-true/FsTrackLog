@@ -24,6 +24,7 @@ namespace FsTrackLogApp
         private string _status;
         private string _startStopButtonText = "START";
         private string _connectButtonText;
+        private AircraftInfoViewModel _aircraftInfo;
 
         public ICommand ConnectCommand { get; }
         public ICommand StartStopCommand { get; }
@@ -61,10 +62,22 @@ namespace FsTrackLogApp
             }
         }
 
+        public AircraftInfoViewModel AircraftInfo
+        {
+            get => _aircraftInfo;
+            set
+            {
+                _aircraftInfo = value;
+                OnPropertyChanged();
+            }
+        }
+
         public MainWindowViewModel()
         {
             _provider = new FlightDataProvider();
             _store = new FlightDataStore();
+
+            AircraftInfo = new AircraftInfoViewModel();
 
             ConnectButtonText = "CONNECT";
             StartStopButtonText = "START";
@@ -136,9 +149,9 @@ namespace FsTrackLogApp
 
         void WriteSequenceToView(IObservable<AircraftInfo> sequence)
         {
-            sequence.Sample(TimeSpan.FromSeconds(10)).Subscribe(value =>
+            sequence.Sample(TimeSpan.FromSeconds(3)).Subscribe(value =>
             {
-                Status = $"({value.Latitude:F3}, {value.Longitude:F3}), Elev: {value.Altitude:F0}m, On ground: {value.SimOnGround}";
+                AircraftInfo.SetModel(value);
             }, () =>
             {
                 Status = "Completed";

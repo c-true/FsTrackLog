@@ -4,6 +4,8 @@ namespace CTrue.Fs.FlightData.Contracts
 {
     public struct AircraftInfo
     {
+        public string Title;
+        public string Category;
         public DateTime TimeStamp;
         public double Latitude;
         public double Longitude;

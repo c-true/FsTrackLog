@@ -64,6 +64,8 @@ namespace CTrue.Fs.FlightData.Provider
         {
             return new AircraftInfo()
             {
+                Title = value.Title,
+                Category = value.Category,
                 TimeStamp = GetDateTime(value.ZuluYear, value.ZuluDayOfYear, value.ZuluTime),
                 Latitude = value.Latitude,
                 Longitude = value.Longitude,

@@ -7,6 +7,10 @@ namespace CTrue.Fs.FlightData.Provider
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi, Pack = 1)]
     public struct PlaneInfo
     {
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 256)]
+        public string Title;
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 256)]
+        public string Category;
         [SimVar(NameId = FsSimVar.ZuluYear, UnitId = FsUnit.Number, DataType = SIMCONNECT_DATATYPE.INT64)]
         public ulong ZuluYear;
         [SimVar(NameId = FsSimVar.ZuluDayOfYear, UnitId = FsUnit.Number, DataType = SIMCONNECT_DATATYPE.INT64)]
