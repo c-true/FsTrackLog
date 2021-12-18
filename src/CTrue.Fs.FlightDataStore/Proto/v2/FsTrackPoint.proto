@@ -1,12 +1,5 @@
 ﻿syntax = "proto3";  
-option csharp_namespace = "FsTrackLog.Proto.Generated";  
-
-
-
-message FsTrackLogHeader
-{
-    int32 Version = 1;
-}
+option csharp_namespace = "FsTrackLog.Proto.Generated.v2";  
 
 message FsTrackPoint  
 {  

@@ -1,5 +1,6 @@
 ﻿using System.IO;
 using FsTrackLog.Proto.Generated;
+using FsTrackLog.Proto.Generated.v1;
 
 namespace CTrue.Fs.FlightData.Store
 {

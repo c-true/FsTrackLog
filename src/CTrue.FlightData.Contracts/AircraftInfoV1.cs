@@ -2,7 +2,7 @@
 
 namespace CTrue.Fs.FlightData.Contracts
 {
-    public struct AircraftInfo
+    public struct AircraftInfoV1
     {
         public string Title;
         public string Category;

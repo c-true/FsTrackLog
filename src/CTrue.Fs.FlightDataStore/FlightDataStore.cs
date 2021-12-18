@@ -31,7 +31,7 @@ namespace CTrue.Fs.FlightData.Store
             _isOpen = false;
         }
 
-        public void Write(AircraftInfo value)
+        public void Write(AircraftInfoV1 value)
         {
             if (!_isOpen) return;
 

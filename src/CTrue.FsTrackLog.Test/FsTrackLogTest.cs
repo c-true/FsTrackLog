@@ -20,7 +20,7 @@ namespace CTrue.FsTrackLog.Test
 
             FsTrackLogger writer = new FsTrackLogger(ms);
 
-            writer.LogTrackPoint(new AircraftInfo()
+            writer.LogTrackPoint(new AircraftInfoV1()
             {
                 Latitude = 60,
                 Longitude = 10,

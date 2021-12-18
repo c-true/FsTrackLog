@@ -5,9 +5,9 @@ namespace CTrue.Fs.FlightData.Provider
 {
     public class AircraftDataReceivedEventArgs : EventArgs
     {
-        public AircraftInfo AircraftInfo { get; }
+        public AircraftInfoV1 AircraftInfo { get; }
 
-        public AircraftDataReceivedEventArgs(AircraftInfo aircraftInfo)
+        public AircraftDataReceivedEventArgs(AircraftInfoV1 aircraftInfo)
         {
             AircraftInfo = aircraftInfo;
         }

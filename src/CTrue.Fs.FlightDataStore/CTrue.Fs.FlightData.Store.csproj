@@ -6,6 +6,7 @@
 
   <ItemGroup>
     <None Remove="Proto\FsTrackPoint.proto" />
+    <None Remove="Proto\v1\FsTrackPoint - Copy.proto" />
   </ItemGroup>
 
   <ItemGroup>
@@ -22,7 +23,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Protobuf Include="Proto\FsTrackPoint.proto" GrpcServices="Client" />
+    <Protobuf Include="Proto\FsTrackLogHeader.proto" GrpcServices="Client" />
+    <Protobuf Include="Proto\v2\FsTrackPoint.proto" GrpcServices="Client" />
+    <Protobuf Include="Proto\v1\FsTrackPoint.proto" GrpcServices="Client" />
   </ItemGroup>
 
 </Project>

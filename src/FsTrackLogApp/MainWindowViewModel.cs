@@ -16,7 +16,7 @@ namespace FsTrackLogApp
     {
         private FlightDataProvider _provider;
         private FlightDataStore _store;
-        private IObservable<AircraftInfo> _aircraftInfoObservable;
+        private IObservable<AircraftInfoV1> _aircraftInfoObservable;
 
         private bool _connected = false;
         private bool _started = false;
@@ -147,7 +147,7 @@ namespace FsTrackLogApp
             return _connected;
         }
 
-        void WriteSequenceToView(IObservable<AircraftInfo> sequence)
+        void WriteSequenceToView(IObservable<AircraftInfoV1> sequence)
         {
             sequence.Sample(TimeSpan.FromSeconds(3)).Subscribe(value =>
             {

@@ -87,7 +87,7 @@ namespace FsTrackLogApp
 
         }
 
-        public void SetModel(AircraftInfo value)
+        public void SetModel(AircraftInfoV1 value)
         {
             Title = value.Title;
             Position = $"({value.Latitude.ToString("F3")}, {value.Longitude.ToString("F3")})";

@@ -46,7 +46,7 @@ namespace FsTrackLog
 
         private static void Run(Options options)
         {
-            IObservable<AircraftInfo> _aircraftInfoObservable;
+            IObservable<AircraftInfoV1> _aircraftInfoObservable;
             FlightDataProvider _provider = new FlightDataProvider();
             FlightDataStore _store = new FlightDataStore();
 
@@ -124,7 +124,7 @@ namespace FsTrackLog
             }
         }
 
-        static void WriteSequenceToConsole(IObservable<AircraftInfo> sequence)
+        static void WriteSequenceToConsole(IObservable<AircraftInfoV1> sequence)
         {
             sequence.Subscribe(value =>
             {

@@ -60,9 +60,9 @@ namespace CTrue.Fs.FlightData.Provider
             };
         }
 
-        private AircraftInfo ConvertToDataFormat(PlaneInfo value)
+        private AircraftInfoV1 ConvertToDataFormat(PlaneInfo value)
         {
-            return new AircraftInfo()
+            return new AircraftInfoV1()
             {
                 Title = value.Title,
                 Category = value.Category,

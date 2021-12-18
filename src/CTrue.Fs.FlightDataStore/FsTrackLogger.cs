@@ -2,6 +2,7 @@
 using System.IO;
 using CTrue.Fs.FlightData.Contracts;
 using FsTrackLog.Proto.Generated;
+using FsTrackLog.Proto.Generated.v1;
 using Google.Protobuf;
 
 namespace CTrue.Fs.FlightData.Store
@@ -52,7 +53,7 @@ namespace CTrue.Fs.FlightData.Store
         }
         
 
-        public void LogTrackPoint(AircraftInfo value)
+        public void LogTrackPoint(AircraftInfoV1 value)
         {
             var tp = GetAircraftInfoBytes(value);
             tp.WriteDelimitedTo(_stream);
@@ -63,7 +64,7 @@ namespace CTrue.Fs.FlightData.Store
             return $"FsTrackLog_{DateTime.Now.ToString("yyyyMMddhhmmss")}.fst";
         }
 
-        private static FsTrackPoint GetAircraftInfoBytes(AircraftInfo value)
+        private static FsTrackPoint GetAircraftInfoBytes(AircraftInfoV1 value)
         {
             FsTrackPoint tp = new FsTrackPoint();
 
