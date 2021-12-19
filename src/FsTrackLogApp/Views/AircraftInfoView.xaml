@@ -38,8 +38,12 @@
                 Text="Position" />
             <TextBlock
                 Grid.Row="1"
-                Grid.Column="1"
-                Text="{Binding Position}" />
+                Grid.Column="1" >
+                <Hyperlink 
+                    Command="{Binding ShowPosCommand}" CommandParameter="{Binding Position}">
+                    <TextBlock Text="{Binding Position}" />
+                </Hyperlink>
+            </TextBlock>
 
             <TextBlock
                 Grid.Row="2"

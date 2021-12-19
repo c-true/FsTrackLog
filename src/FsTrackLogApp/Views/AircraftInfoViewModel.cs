@@ -1,5 +1,8 @@
 ﻿using System.ComponentModel;
+using System.Diagnostics;
+using System.Globalization;
 using System.Runtime.CompilerServices;
+using System.Windows.Input;
 using CTrue.Fs.FlightData.Contracts;
 using FsTrackLogApp.Annotations;
 
@@ -7,6 +10,8 @@ namespace FsTrackLogApp
 {
     public class AircraftInfoViewModel : INotifyPropertyChanged
     {
+        private AircraftInfoV1 _model;
+
         private string _position;
         private string _altitude;
         private string _speed;
@@ -82,13 +87,34 @@ namespace FsTrackLogApp
             }
         }
 
+        public ICommand ShowPosCommand { get; }
+
         public AircraftInfoViewModel()
         {
+            ShowPosCommand = new DelegateCommand<object>(ShowPos, CanShowPos);
+        }
 
+        private bool CanShowPos(object arg)
+        {
+            return true;
+        }
+
+        private void ShowPos(object obj)
+        {
+            string lat = _model.Latitude.ToString("F7", CultureInfo.InvariantCulture);
+            string lon = _model.Longitude.ToString("F7", CultureInfo.InvariantCulture);
+            string url = $"https://www.google.com/maps/search/?api=1&query={lat}%2C{lon}";
+            System.Diagnostics.Process.Start(new ProcessStartInfo
+            {
+                FileName = url,
+                UseShellExecute = true
+            });
         }
 
         public void SetModel(AircraftInfoV1 value)
         {
+            _model = value;
+
             Title = value.Title;
             Position = $"({value.Latitude.ToString("F3")}, {value.Longitude.ToString("F3")})";
             Altitude = $"{value.Altitude.ToString("F0")}ft ({value.AltitudeAboveGround.ToString("F0")}ft ag)";
