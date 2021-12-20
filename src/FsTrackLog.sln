@@ -18,7 +18,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CTrue.Fs.FlightData.Store",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CTrue.Fs.FlightData.Contracts", "CTrue.FlightData.Contracts\CTrue.Fs.FlightData.Contracts.csproj", "{0F96DC6C-D27D-49AF-B37E-938E7F877239}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FsTrackLogApp", "FsTrackLogApp\FsTrackLogApp.csproj", "{0B05AFE2-42F2-4B7E-B919-3CD72C7B7960}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FsTrackLogApp", "FsTrackLogApp\FsTrackLogApp.csproj", "{0B05AFE2-42F2-4B7E-B919-3CD72C7B7960}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CTrue.FsTrackLog.Core", "CTrue.FsTrackLog.Core\CTrue.FsTrackLog.Core.csproj", "{408408C4-244E-40A2-8C87-C4BF69DF6EE9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -50,6 +52,10 @@ Global
 		{0B05AFE2-42F2-4B7E-B919-3CD72C7B7960}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0B05AFE2-42F2-4B7E-B919-3CD72C7B7960}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0B05AFE2-42F2-4B7E-B919-3CD72C7B7960}.Release|Any CPU.Build.0 = Release|Any CPU
+		{408408C4-244E-40A2-8C87-C4BF69DF6EE9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{408408C4-244E-40A2-8C87-C4BF69DF6EE9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{408408C4-244E-40A2-8C87-C4BF69DF6EE9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{408408C4-244E-40A2-8C87-C4BF69DF6EE9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

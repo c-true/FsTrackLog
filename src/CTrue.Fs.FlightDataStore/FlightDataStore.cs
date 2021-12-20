@@ -4,7 +4,14 @@ using CTrue.Fs.FlightData.Contracts;
 
 namespace CTrue.Fs.FlightData.Store
 {
-    public class FlightDataStore
+    public interface IFlightDataStore
+    {
+        void Initialize(string directory);
+        void Close();
+        void Write(AircraftInfoV1 value);
+    }
+
+    public class FlightDataStore : IFlightDataStore
     {
         private static FsTrackLogger _trackLogger;
         private bool _isOpen;

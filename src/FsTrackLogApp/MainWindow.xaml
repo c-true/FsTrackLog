@@ -23,6 +23,14 @@
             <ColumnDefinition />
         </Grid.ColumnDefinitions>
         <StackPanel>
+
+            <Button
+                Width="80"
+                HorizontalAlignment="Right"
+                Command="{Binding ConnectCommand}"
+                Content="{Binding ConnectButtonText}"
+                Style="{StaticResource MyBtnStyle}" />
+
             <Button
                 Width="80"
                 Command="{Binding StartStopCommand}"
@@ -31,12 +39,6 @@
         </StackPanel>
 
         <StackPanel Grid.Column="2">
-            <Button
-                Width="80"
-                HorizontalAlignment="Right"
-                Command="{Binding ConnectCommand}"
-                Content="{Binding ConnectButtonText}"
-                Style="{StaticResource MyBtnStyle}" />
 
             <TextBlock
                 Grid.Row="0"

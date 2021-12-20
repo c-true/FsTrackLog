@@ -1,7 +1,6 @@
 ﻿using System;
-using CTrue.Fs.FlightData.Contracts;
 
-namespace CTrue.Fs.FlightData.Provider
+namespace CTrue.Fs.FlightData.Contracts
 {
     public class AircraftDataReceivedEventArgs : EventArgs
     {

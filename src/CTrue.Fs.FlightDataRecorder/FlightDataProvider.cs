@@ -7,7 +7,7 @@ using CTrue.FsConnect.Managers;
 
 namespace CTrue.Fs.FlightData.Provider
 {
-    public class FlightDataProvider
+    public class FlightDataProvider : IFlightDataProvider
     {
         private static AutoResetEvent _resetEvent = new AutoResetEvent(false);
         private FsConnect.FsConnect _fsConnect;
