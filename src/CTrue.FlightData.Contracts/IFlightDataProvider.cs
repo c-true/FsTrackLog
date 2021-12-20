@@ -2,7 +2,7 @@
 
 namespace CTrue.Fs.FlightData.Contracts
 {
-    public interface IFlightDataProvider
+    public interface IFlightDataProvider : IDisposable
     {
         event EventHandler<AircraftDataReceivedEventArgs> AircraftDataReceived;
 

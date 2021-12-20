@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Reactive.Subjects;
+using System.Runtime.InteropServices;
 using System.Threading;
 using CTrue.Fs.FlightData.Contracts;
 using CTrue.FsConnect;
@@ -11,6 +12,7 @@ namespace CTrue.Fs.FlightData.Provider
     {
         private static AutoResetEvent _resetEvent = new AutoResetEvent(false);
         private FsConnect.FsConnect _fsConnect;
+        private AircraftManager<PlaneInfo> _aircraftManager;
 
         public event EventHandler<AircraftDataReceivedEventArgs> AircraftDataReceived;
 
@@ -22,7 +24,7 @@ namespace CTrue.Fs.FlightData.Provider
         {
         }
 
-        public void Start()
+        public void Initialize()
         {
             _fsConnect = new FsConnect.FsConnect();
             _fsConnect.SimConnectFileLocation = SimConnectFileLocation.MyDocuments;
@@ -32,8 +34,27 @@ namespace CTrue.Fs.FlightData.Provider
                 {
                     _fsConnect.RegisterDataDefinition<PlaneInfo>(FsDefinitions.AircraftInfo);
                     _resetEvent.Set();
+                    _aircraftManager.RequestMethod = RequestMethod.Continuously;
                 }
             };
+            
+            _aircraftManager = new AircraftManager<PlaneInfo>(_fsConnect, FsDefinitions.AircraftInfo, FsRequests.AircraftPeriodic);
+
+            _aircraftManager.RequestMethod = RequestMethod.Poll;
+            _aircraftManager.Updated += (sender, args) =>
+            {
+                var aircraftInfo = ConvertToDataFormat(args.AircraftInfo);
+
+                AircraftDataReceived?.Invoke(this, new AircraftDataReceivedEventArgs(aircraftInfo));
+            };
+        }
+
+        public void Connect()
+        {
+            if (_fsConnect == null)
+                throw new ApplicationException("Can not start Flight Data provider. Not initialized");
+
+            if (_fsConnect.Connected) return;
 
             _fsConnect.Connect("FS Track Log", HostName, Port, SimConnectProtocol.Ipv4);
 
@@ -46,20 +67,36 @@ namespace CTrue.Fs.FlightData.Provider
             }
             else
                 Console.WriteLine("Connected to Flight Simulator");
-
-
-            AircraftManager<PlaneInfo> aircraftManager =
-                new AircraftManager<PlaneInfo>(_fsConnect, FsDefinitions.AircraftInfo, FsRequests.AircraftPeriodic);
-
-            aircraftManager.RequestMethod = RequestMethod.Continuously;
-            aircraftManager.Updated += (sender, args) =>
-            {
-                var aircraftInfo = ConvertToDataFormat(args.AircraftInfo);
-
-                AircraftDataReceived?.Invoke(this, new AircraftDataReceivedEventArgs(aircraftInfo));
-            };
         }
 
+        public void Disconnect()
+        {
+            if (_fsConnect == null)
+                throw new ApplicationException("Can not start Flight Data provider. Not initialized");
+
+            if (!_fsConnect.Connected) return;
+
+            _fsConnect.Disconnect();
+        }
+
+        public void Start()
+        {
+            if (_fsConnect == null)
+                throw new ApplicationException("Can not start Flight Data provider. Not initialized");
+
+            _aircraftManager.RequestMethod = RequestMethod.Continuously;
+        }
+
+        public void Stop()
+        {
+            if (_fsConnect == null) return;
+
+            _aircraftManager.RequestMethod = RequestMethod.Poll;
+
+            _fsConnect.Disconnect();
+        }
+
+       
         private AircraftInfoV1 ConvertToDataFormat(PlaneInfo value)
         {
             return new AircraftInfoV1()
@@ -77,16 +114,15 @@ namespace CTrue.Fs.FlightData.Provider
             };
         }
 
-        public void Stop()
-        {
-            _fsConnect.Disconnect();
-            _fsConnect.Dispose();
-            _fsConnect = null;
-        }
-
         private static DateTime GetDateTime(ulong year, ulong dayInYear, ulong secondsInDay)
         {
             return new DateTime((int)year, 1, 1).AddDays(dayInYear).AddSeconds(secondsInDay);
+        }
+
+        public void Dispose()
+        {
+            _aircraftManager?.Dispose();
+            _fsConnect?.Dispose();
         }
     }
 }
