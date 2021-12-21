@@ -8,12 +8,14 @@ using System.Windows.Input;
 using CTrue.Fs.FlightData.Contracts;
 using CTrue.Fs.FlightData.Provider;
 using CTrue.Fs.FlightData.Store;
+using CTrue.FsTrackLog.Core;
 using FsTrackLogApp.Annotations;
 
 namespace FsTrackLogApp
 {
     public class MainWindowViewModel : INotifyPropertyChanged
     {
+        private IFsTrackLogManager _trackLogManager;
         private FlightDataProvider _provider;
         private FlightDataStore _store;
         private IObservable<AircraftInfoV1> _aircraftInfoObservable;
@@ -74,6 +76,26 @@ namespace FsTrackLogApp
 
         public MainWindowViewModel()
         {
+            try
+            {
+                _trackLogManager = new FsTrackLogManager(new FlightDataProvider(), new FlightDataStore());
+
+                var config = new FsTrackLogConfig()
+                {
+                    HostName = "192.168.1.174",
+                    Port = 57490,
+                    AutoConnect = true,
+                    AutoLog = true,
+                    StorePath = "c:\\temp\\FsTrackLog"
+                };
+
+                _trackLogManager.Initialize(config);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
+
             _provider = new FlightDataProvider();
             _store = new FlightDataStore();
 
@@ -91,6 +113,8 @@ namespace FsTrackLogApp
 
             WriteSequenceToView(_aircraftInfoObservable);
         }
+
+
 
         private void Connect(object obj)
         {

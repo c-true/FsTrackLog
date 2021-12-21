@@ -5,7 +5,14 @@ using CTrue.Fs.FlightData.Store;
 
 namespace CTrue.FsTrackLog.Core
 {
-    public class FsTrackLogManager
+    public interface IFsTrackLogManager
+    {
+        void Initialize(FsTrackLogConfig config);
+        void Start();
+        void Stop();
+    }
+
+    public class FsTrackLogManager : IFsTrackLogManager
     {
         private readonly IFlightDataProvider _provider;
         private readonly IFlightDataStore _store;
@@ -30,7 +37,12 @@ namespace CTrue.FsTrackLog.Core
                     h => _provider.AircraftDataReceived -= h)
                 .Select(k => k.EventArgs.AircraftInfo);
 
+            _provider.Closed += (sender, args) => onClose();
+
             _aircraftInfoObservable.Subscribe(_store.Write, _store.Close);
+
+            _provider.AutoConnect = config.AutoConnect;
+            _provider.Initialize();
 
             if (config.AutoConnect)
             {
@@ -46,6 +58,16 @@ namespace CTrue.FsTrackLog.Core
         public void Stop()
         {
             _provider.Stop();
+        }
+
+        private void onNext(AircraftInfoV1 value)
+        {
+            _store.Write(value);
+        }
+
+        private void onClose()
+        {
+            _store.Close();
         }
     }
 }

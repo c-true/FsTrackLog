@@ -34,6 +34,18 @@ namespace CTrue.FsTrackLog.Test
             A.CallTo(() => provider.Start()).MustHaveHappened();
         }
 
+        [Test]
+        public void Test2()
+        {
+            // Arrange
+
+
+            // Act
+
+
+            // Assert
+        }
+
 
     }
 }

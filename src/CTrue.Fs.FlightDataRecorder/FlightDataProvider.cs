@@ -5,6 +5,7 @@ using System.Threading;
 using CTrue.Fs.FlightData.Contracts;
 using CTrue.FsConnect;
 using CTrue.FsConnect.Managers;
+using Serilog;
 
 namespace CTrue.Fs.FlightData.Provider
 {
@@ -13,8 +14,12 @@ namespace CTrue.Fs.FlightData.Provider
         private static AutoResetEvent _resetEvent = new AutoResetEvent(false);
         private FsConnect.FsConnect _fsConnect;
         private AircraftManager<PlaneInfo> _aircraftManager;
+        private Timer _connectTimer;
 
         public event EventHandler<AircraftDataReceivedEventArgs> AircraftDataReceived;
+        public event EventHandler Closed;
+
+        public bool AutoConnect { get; set; }
 
         public string HostName { get; set; }
 
@@ -36,6 +41,10 @@ namespace CTrue.Fs.FlightData.Provider
                     _resetEvent.Set();
                     _aircraftManager.RequestMethod = RequestMethod.Continuously;
                 }
+                else
+                {
+                    Closed?.Invoke(this, EventArgs.Empty);
+                }
             };
             
             _aircraftManager = new AircraftManager<PlaneInfo>(_fsConnect, FsDefinitions.AircraftInfo, FsRequests.AircraftPeriodic);
@@ -47,6 +56,9 @@ namespace CTrue.Fs.FlightData.Provider
 
                 AircraftDataReceived?.Invoke(this, new AircraftDataReceivedEventArgs(aircraftInfo));
             };
+
+            if (AutoConnect)
+                _connectTimer = new Timer(OnConnectTimer, null, 1000, 0);
         }
 
         public void Connect()
@@ -96,7 +108,26 @@ namespace CTrue.Fs.FlightData.Provider
             _fsConnect.Disconnect();
         }
 
-       
+
+        private void OnConnectTimer(object state)
+        {
+            try
+            {
+                if (!_fsConnect.Connected)
+                {
+                   Log.Debug("Autoconnecting");
+
+                    Connect();
+                }
+            }
+            catch (Exception e)
+            {
+                Log.Error(e, "Could not automatically connect to MSFS");
+            }
+
+            _connectTimer.Change(1000, 0);
+        }
+
         private AircraftInfoV1 ConvertToDataFormat(PlaneInfo value)
         {
             return new AircraftInfoV1()
