@@ -22,6 +22,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FsTrackLogApp", "FsTrackLog
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CTrue.FsTrackLog.Core", "CTrue.FsTrackLog.Core\CTrue.FsTrackLog.Core.csproj", "{408408C4-244E-40A2-8C87-C4BF69DF6EE9}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CTrue.FsTrackLog.Contracts", "CTrue.FsTrackLog.Contracts\CTrue.FsTrackLog.Contracts.csproj", "{DD03139D-4B3A-4ECD-B207-55BF70B9BDDC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -56,6 +58,10 @@ Global
 		{408408C4-244E-40A2-8C87-C4BF69DF6EE9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{408408C4-244E-40A2-8C87-C4BF69DF6EE9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{408408C4-244E-40A2-8C87-C4BF69DF6EE9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DD03139D-4B3A-4ECD-B207-55BF70B9BDDC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DD03139D-4B3A-4ECD-B207-55BF70B9BDDC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DD03139D-4B3A-4ECD-B207-55BF70B9BDDC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DD03139D-4B3A-4ECD-B207-55BF70B9BDDC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

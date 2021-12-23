@@ -8,6 +8,7 @@ namespace CTrue.Fs.FlightData.Store
     {
         void Initialize(string directory);
         void Close();
+
         void Write(AircraftInfoV1 value);
     }
 
@@ -27,6 +28,7 @@ namespace CTrue.Fs.FlightData.Store
 
             _trackLogger = new FsTrackLogger(di.FullName);
             _isOpen = true;
+            
             Console.WriteLine($"Writing binary Track Log to {_trackLogger.FileName}");
         }
 
@@ -44,7 +46,7 @@ namespace CTrue.Fs.FlightData.Store
 
             if (value.SimOnGround) return;
 
-            _trackLogger?.LogTrackPoint(value);
+            _trackLogger?.WriteNext(value);
         }
     }
 }

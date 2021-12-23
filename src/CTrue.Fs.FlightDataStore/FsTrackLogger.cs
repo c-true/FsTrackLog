@@ -1,13 +1,14 @@
 ﻿using System;
 using System.IO;
 using CTrue.Fs.FlightData.Contracts;
+using CTrue.FsTrackLog.Contracts;
 using FsTrackLog.Proto.Generated;
 using FsTrackLog.Proto.Generated.v1;
 using Google.Protobuf;
 
 namespace CTrue.Fs.FlightData.Store
 {
-    public class FsTrackLogger
+    public class FsTrackLogger : ITrackLogWriter
     {
         private const byte FSTRACKLOG_BINARY_VERSION = 0x01;
 
@@ -53,7 +54,7 @@ namespace CTrue.Fs.FlightData.Store
         }
         
 
-        public void LogTrackPoint(AircraftInfoV1 value)
+        public void WriteNext(AircraftInfoV1 value)
         {
             var tp = GetAircraftInfoBytes(value);
             tp.WriteDelimitedTo(_stream);

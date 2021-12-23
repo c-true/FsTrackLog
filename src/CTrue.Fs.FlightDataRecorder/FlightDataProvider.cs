@@ -74,11 +74,11 @@ namespace CTrue.Fs.FlightData.Provider
 
             if (!success)
             {
-                Console.WriteLine($"Could not connect to {HostName}:{Port}.");
+                Log.Error($"Could not connect to {HostName}:{Port}.");
                 return;
             }
-            else
-                Console.WriteLine("Connected to Flight Simulator");
+            
+            Log.Information("Connected to Flight Simulator");
         }
 
         public void Disconnect()

@@ -21,6 +21,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\CTrue.FlightData.Contracts\CTrue.Fs.FlightData.Contracts.csproj" />
+    <ProjectReference Include="..\CTrue.FsTrackLog.Contracts\CTrue.FsTrackLog.Contracts.csproj" />
   </ItemGroup>
 
   <ItemGroup>
