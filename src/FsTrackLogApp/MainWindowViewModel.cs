@@ -24,12 +24,24 @@ namespace FsTrackLogApp
         private bool _started = false;
 
         private string _status;
+        private string _connectionStatusText;
         private string _startStopButtonText = "START";
         private string _connectButtonText;
         private AircraftInfoViewModel _aircraftInfo;
 
         public ICommand ConnectCommand { get; }
         public ICommand StartStopCommand { get; }
+
+        public string ConnectionStatusText
+        {
+            get => _connectionStatusText;
+            set
+            {
+                if (value == _connectionStatusText) return;
+                _connectionStatusText = value;
+                OnPropertyChanged();
+            }
+        }
 
         public string StartStopButtonText
         {
@@ -79,11 +91,12 @@ namespace FsTrackLogApp
             try
             {
                 _trackLogManager = new FsTrackLogManager(new FlightDataProvider(), new FlightDataStore());
+                _trackLogManager.ConnectionChanged += HandleConnectionChanged;
 
                 var config = new FsTrackLogConfig()
                 {
                     HostName = "192.168.1.174",
-                    Port = 57490,
+                    Port = 500,
                     AutoConnect = true,
                     AutoLog = true,
                     StorePath = "c:\\temp\\FsTrackLog"
@@ -114,6 +127,10 @@ namespace FsTrackLogApp
             WriteSequenceToView(_aircraftInfoObservable);
         }
 
+        private void HandleConnectionChanged(object? sender, bool connectionStatus)
+        {
+            ConnectionStatusText = connectionStatus ? "CONNECTED" : "DISCONNECTED";
+        }
 
 
         private void Connect(object obj)
@@ -129,7 +146,7 @@ namespace FsTrackLogApp
                 else
                 {
                     _provider.HostName = "192.168.1.174";
-                    _provider.Port = 57490;
+                    _provider.Port = 500;
                     _provider.Start();
 
                     Status = "Connected";

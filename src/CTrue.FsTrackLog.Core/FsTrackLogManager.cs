@@ -10,6 +10,7 @@ namespace CTrue.FsTrackLog.Core
         void Initialize(FsTrackLogConfig config);
         void Start();
         void Stop();
+        event EventHandler<bool> ConnectionChanged;
     }
 
     public class FsTrackLogManager : IFsTrackLogManager
@@ -18,6 +19,8 @@ namespace CTrue.FsTrackLog.Core
         private readonly IFlightDataStore _store;
 
         private IObservable<AircraftInfoV1> _aircraftInfoObservable;
+
+        public event EventHandler<bool> ConnectionChanged;
 
         public FsTrackLogManager(IFlightDataProvider provider, IFlightDataStore store)
         {
@@ -38,6 +41,7 @@ namespace CTrue.FsTrackLog.Core
                 .Select(k => k.EventArgs.AircraftInfo);
 
             _provider.Closed += (sender, args) => onClose();
+            _provider.ConnectionChanged += (sender, b) => ConnectionChanged?.Invoke(this, b);
 
             _aircraftInfoObservable.Subscribe(_store.Write, _store.Close);
 

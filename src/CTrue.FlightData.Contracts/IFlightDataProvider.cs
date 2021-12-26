@@ -4,6 +4,7 @@ namespace CTrue.Fs.FlightData.Contracts
 {
     public interface IFlightDataProvider : IDisposable
     {
+        event EventHandler<bool> ConnectionChanged;
         event EventHandler<AircraftDataReceivedEventArgs> AircraftDataReceived;
         event EventHandler Closed;
 

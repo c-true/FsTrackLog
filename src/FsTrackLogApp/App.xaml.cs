@@ -5,6 +5,7 @@ using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
+using Serilog;
 
 namespace FsTrackLogApp
 {
@@ -13,5 +14,19 @@ namespace FsTrackLogApp
     /// </summary>
     public partial class App : Application
     {
+        #region Overrides of Application
+
+        protected override void OnStartup(StartupEventArgs e)
+        {
+            Log.Logger = new LoggerConfiguration()
+                .ReadFrom.AppSettings()
+                .CreateLogger();
+
+            Log.Information("Application started");
+
+            base.OnStartup(e);
+        }
+
+        #endregion
     }
 }

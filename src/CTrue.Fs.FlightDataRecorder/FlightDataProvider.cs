@@ -16,6 +16,7 @@ namespace CTrue.Fs.FlightData.Provider
         private AircraftManager<PlaneInfo> _aircraftManager;
         private Timer _connectTimer;
 
+        public event EventHandler<bool> ConnectionChanged;
         public event EventHandler<AircraftDataReceivedEventArgs> AircraftDataReceived;
         public event EventHandler Closed;
 
@@ -24,6 +25,8 @@ namespace CTrue.Fs.FlightData.Provider
         public string HostName { get; set; }
 
         public uint Port { get; set; }
+
+        public bool Connected => _fsConnect?.Connected ?? false;
 
         public FlightDataProvider()
         {
@@ -45,6 +48,8 @@ namespace CTrue.Fs.FlightData.Provider
                 {
                     Closed?.Invoke(this, EventArgs.Empty);
                 }
+
+                ConnectionChanged?.Invoke(this, _fsConnect.Connected);
             };
             
             _aircraftManager = new AircraftManager<PlaneInfo>(_fsConnect, FsDefinitions.AircraftInfo, FsRequests.AircraftPeriodic);
@@ -71,13 +76,7 @@ namespace CTrue.Fs.FlightData.Provider
             _fsConnect.Connect("FS Track Log", HostName, Port, SimConnectProtocol.Ipv4);
 
             bool success = _resetEvent.WaitOne(2000);
-
-            if (!success)
-            {
-                Log.Error($"Could not connect to {HostName}:{Port}.");
-                return;
-            }
-            
+           
             Log.Information("Connected to Flight Simulator");
         }
 

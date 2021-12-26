@@ -23,7 +23,7 @@
             <ColumnDefinition />
         </Grid.ColumnDefinitions>
         <StackPanel>
-
+            <TextBlock Text="{Binding ConnectionStatusText}" />
             <Button
                 Width="80"
                 HorizontalAlignment="Right"
