@@ -4,13 +4,14 @@ using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
 using CTrue.Fs.FlightData.Contracts;
+using CTrue.FsTrackLog.Core;
 using FsTrackLogApp.Annotations;
 
 namespace FsTrackLogApp
 {
     public class AircraftInfoViewModel : INotifyPropertyChanged
     {
-        private AircraftInfoV1 _model;
+        private IFsTrackLog _model;
 
         private string _position;
         private string _altitude;
@@ -101,8 +102,8 @@ namespace FsTrackLogApp
 
         private void ShowPos(object obj)
         {
-            string lat = _model.Latitude.ToString("F7", CultureInfo.InvariantCulture);
-            string lon = _model.Longitude.ToString("F7", CultureInfo.InvariantCulture);
+            string lat = _model.Value.Latitude.ToString("F7", CultureInfo.InvariantCulture);
+            string lon = _model.Value.Longitude.ToString("F7", CultureInfo.InvariantCulture);
             string url = $"https://www.google.com/maps/search/?api=1&query={lat}%2C{lon}";
             System.Diagnostics.Process.Start(new ProcessStartInfo
             {
@@ -111,17 +112,24 @@ namespace FsTrackLogApp
             });
         }
 
-        public void SetModel(AircraftInfoV1 value)
+        public void SetModel(IFsTrackLog tracklog)
         {
-            _model = value;
+            _model = tracklog;
+            _model.TrackLogUpdated += (sender, args) =>
+            {
+                UpdateViewModel();
+            };
+        }
 
-            Title = value.Title;
-            Position = $"({value.Latitude.ToString("F3")}, {value.Longitude.ToString("F3")})";
-            Altitude = $"{value.Altitude.ToString("F0")}ft ({value.AltitudeAboveGround.ToString("F0")}ft ag)";
-            Heading = value.Heading.ToString("F0");
-            Speed = value.Speed.ToString("F0");
-            
-            SimOnGround = value.SimOnGround;
+        private void UpdateViewModel()
+        {
+            Title = _model.Value.Title;
+            Position = $"({_model.Value.Latitude.ToString("F3")}, {_model.Value.Longitude.ToString("F3")})";
+            Altitude = $"{_model.Value.Altitude.ToString("F0")}ft ({_model.Value.AltitudeAboveGround.ToString("F0")}ft ag)";
+            Heading = _model.Value.Heading.ToString("F0");
+            Speed = _model.Value.Speed.ToString("F0");
+
+            SimOnGround = _model.Value.SimOnGround;
         }
 
         [NotifyPropertyChangedInvocator]

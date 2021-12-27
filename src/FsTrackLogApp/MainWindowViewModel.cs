@@ -26,6 +26,7 @@ namespace FsTrackLogApp
         private string _startStopButtonText = "START";
         private string _connectButtonText;
         private AircraftInfoViewModel _aircraftInfo;
+        private AircraftInfoViewModel _trackLogViewModel;
 
         public ICommand ConnectCommand { get; }
         public ICommand StartStopCommand { get; }
@@ -90,6 +91,7 @@ namespace FsTrackLogApp
             {
                 _trackLogManager = new FsTrackLogManager(new FlightDataProvider(), new FlightDataStore());
                 _trackLogManager.ConnectionChanged += HandleConnectionChanged;
+                _trackLogManager.CurrentTrackLogChanged += HandleCurrentTrackLogChanged;
 
                 var config = new FsTrackLogConfig()
                 {
@@ -113,8 +115,6 @@ namespace FsTrackLogApp
             StartStopButtonText = "START";
             ConnectCommand = new DelegateCommand<object>(Connect, CanConnect);
             StartStopCommand = new DelegateCommand<object>(StartStop, CanStartStop);
-
-            WriteSequenceToView(_trackLogManager.AircraftInfoObservable);
         }
 
         private void HandleConnectionChanged(object? sender, bool connectionStatus)
@@ -127,6 +127,22 @@ namespace FsTrackLogApp
             ((DelegateCommand<object>)StartStopCommand).RaiseCanExecuteChanged();
         }
 
+        private void HandleCurrentTrackLogChanged(object? sender, IFsTrackLog trackLog)
+        {
+            TrackLogViewModel = new AircraftInfoViewModel();
+            TrackLogViewModel.SetModel(trackLog);
+        }
+
+        public AircraftInfoViewModel TrackLogViewModel
+        {
+            get => _trackLogViewModel;
+            set
+            {
+                if (Equals(value, _trackLogViewModel)) return;
+                _trackLogViewModel = value;
+                OnPropertyChanged();
+            }
+        }
 
         private void Connect(object obj)
         {
@@ -171,17 +187,6 @@ namespace FsTrackLogApp
         private bool CanStartStop(object arg)
         {
             return _connected;
-        }
-
-        void WriteSequenceToView(IObservable<AircraftInfoV1> sequence)
-        {
-            sequence.Sample(TimeSpan.FromSeconds(3)).Subscribe(value =>
-            {
-                AircraftInfo.SetModel(value);
-            }, () =>
-            {
-                Status = "Completed";
-            });
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

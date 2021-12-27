@@ -7,6 +7,8 @@ namespace CTrue.FsTrackLog.Core
     public interface IFsTrackLog
     {
         event EventHandler TrackLogUpdated;
+
+        AircraftInfoV1 Value { get; set; }
     }
 
     public class FsTrackLog : IFsTrackLog
@@ -19,7 +21,7 @@ namespace CTrue.FsTrackLog.Core
 
         public string AircraftName { get; set; }
 
-        public AircraftInfoV1 LastValue { get; set; }
+        public AircraftInfoV1 Value { get; set; }
 
         public FsTrackLog(IFlightDataStore store)
         {
@@ -29,7 +31,7 @@ namespace CTrue.FsTrackLog.Core
 
         public void Write(AircraftInfoV1 value)
         {
-            LastValue = value;
+            Value = value;
 
             _store.Write(value);
             

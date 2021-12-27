@@ -10,8 +10,6 @@ namespace CTrue.FsTrackLog.Core
         event EventHandler<bool> ConnectionChanged;
         event EventHandler<IFsTrackLog> CurrentTrackLogChanged;
         
-        IObservable<AircraftInfoV1> AircraftInfoObservable { get; }
-
         void Initialize(FsTrackLogConfig config);
         void Start();
         void Stop();
@@ -28,8 +26,6 @@ namespace CTrue.FsTrackLog.Core
         public event EventHandler<bool> ConnectionChanged;
 
         public event EventHandler<IFsTrackLog> CurrentTrackLogChanged;
-
-        public IObservable<AircraftInfoV1> AircraftInfoObservable => _aircraftInfoObservable;
 
         public IFsTrackLog CurrentTrackLog => _currentTrackLog;
 

@@ -49,7 +49,7 @@
                 Grid.Row="1"
                 Grid.Column="2"
                 Margin="5"
-                DataContext="{Binding AircraftInfo}" />
+                DataContext="{Binding TrackLogViewModel}" />
         </StackPanel>
 
     </Grid>
