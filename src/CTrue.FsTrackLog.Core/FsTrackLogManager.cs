@@ -7,20 +7,31 @@ namespace CTrue.FsTrackLog.Core
 {
     public interface IFsTrackLogManager
     {
+        event EventHandler<bool> ConnectionChanged;
+        event EventHandler<IFsTrackLog> CurrentTrackLogChanged;
+        
+        IObservable<AircraftInfoV1> AircraftInfoObservable { get; }
+
         void Initialize(FsTrackLogConfig config);
         void Start();
         void Stop();
-        event EventHandler<bool> ConnectionChanged;
     }
 
     public class FsTrackLogManager : IFsTrackLogManager
     {
         private readonly IFlightDataProvider _provider;
         private readonly IFlightDataStore _store;
+        private FsTrackLog _currentTrackLog;
 
         private IObservable<AircraftInfoV1> _aircraftInfoObservable;
 
         public event EventHandler<bool> ConnectionChanged;
+
+        public event EventHandler<IFsTrackLog> CurrentTrackLogChanged;
+
+        public IObservable<AircraftInfoV1> AircraftInfoObservable => _aircraftInfoObservable;
+
+        public IFsTrackLog CurrentTrackLog => _currentTrackLog;
 
         public FsTrackLogManager(IFlightDataProvider provider, IFlightDataStore store)
         {
@@ -43,15 +54,12 @@ namespace CTrue.FsTrackLog.Core
             _provider.Closed += (sender, args) => onClose();
             _provider.ConnectionChanged += (sender, b) => ConnectionChanged?.Invoke(this, b);
 
-            _aircraftInfoObservable.Subscribe(_store.Write, _store.Close);
+            _aircraftInfoObservable.Subscribe(onNext, onClose);
 
             _provider.AutoConnect = config.AutoConnect;
             _provider.Initialize();
 
-            if (config.AutoConnect)
-            {
-                _provider.Start();
-            }
+            _provider.Start();
         }
 
         public void Start()
@@ -66,12 +74,18 @@ namespace CTrue.FsTrackLog.Core
 
         private void onNext(AircraftInfoV1 value)
         {
-            _store.Write(value);
+            if (_currentTrackLog == null)
+            {
+                _currentTrackLog = new FsTrackLog(_store);
+                CurrentTrackLogChanged?.Invoke(this, _currentTrackLog);
+            }
+
+            _currentTrackLog.Write(value);
         }
 
         private void onClose()
         {
-            _store.Close();
+            _currentTrackLog.Close();
         }
     }
 }

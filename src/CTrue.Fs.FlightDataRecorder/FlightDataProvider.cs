@@ -42,7 +42,6 @@ namespace CTrue.Fs.FlightData.Provider
                 {
                     _fsConnect.RegisterDataDefinition<PlaneInfo>(FsDefinitions.AircraftInfo);
                     _resetEvent.Set();
-                    _aircraftManager.RequestMethod = RequestMethod.Continuously;
                 }
                 else
                 {
@@ -69,21 +68,22 @@ namespace CTrue.Fs.FlightData.Provider
         public void Connect()
         {
             if (_fsConnect == null)
-                throw new ApplicationException("Can not start Flight Data provider. Not initialized");
+                throw new ApplicationException("Can not connect. Flight Data provider is not initialized");
 
             if (_fsConnect.Connected) return;
 
             _fsConnect.Connect("FS Track Log", HostName, Port, SimConnectProtocol.Ipv4);
 
             bool success = _resetEvent.WaitOne(2000);
-           
+            _aircraftManager.RequestMethod = RequestMethod.Continuously;
+
             Log.Information("Connected to Flight Simulator");
         }
 
         public void Disconnect()
         {
             if (_fsConnect == null)
-                throw new ApplicationException("Can not start Flight Data provider. Not initialized");
+                throw new ApplicationException("Can not disconnect. Flight Data provider is not initialized");
 
             if (!_fsConnect.Connected) return;
 
@@ -95,7 +95,8 @@ namespace CTrue.Fs.FlightData.Provider
             if (_fsConnect == null)
                 throw new ApplicationException("Can not start Flight Data provider. Not initialized");
 
-            _aircraftManager.RequestMethod = RequestMethod.Continuously;
+            if(!AutoConnect)    // Wait for connection timer if auto connecting
+                Connect();
         }
 
         public void Stop()
@@ -104,7 +105,7 @@ namespace CTrue.Fs.FlightData.Provider
 
             _aircraftManager.RequestMethod = RequestMethod.Poll;
 
-            _fsConnect.Disconnect();
+            Disconnect();
         }
 
 

@@ -10,21 +10,19 @@ using CTrue.Fs.FlightData.Provider;
 using CTrue.Fs.FlightData.Store;
 using CTrue.FsTrackLog.Core;
 using FsTrackLogApp.Annotations;
+using Serilog;
 
 namespace FsTrackLogApp
 {
     public class MainWindowViewModel : INotifyPropertyChanged
     {
         private IFsTrackLogManager _trackLogManager;
-        private FlightDataProvider _provider;
-        private FlightDataStore _store;
-        private IObservable<AircraftInfoV1> _aircraftInfoObservable;
 
         private bool _connected = false;
         private bool _started = false;
 
         private string _status;
-        private string _connectionStatusText;
+        private string _connectionStatusText = "DISCONNECTED";
         private string _startStopButtonText = "START";
         private string _connectButtonText;
         private AircraftInfoViewModel _aircraftInfo;
@@ -106,11 +104,8 @@ namespace FsTrackLogApp
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
+                Log.Error("Could not initialize track log manager.", e);
             }
-
-            _provider = new FlightDataProvider();
-            _store = new FlightDataStore();
 
             AircraftInfo = new AircraftInfoViewModel();
 
@@ -119,17 +114,17 @@ namespace FsTrackLogApp
             ConnectCommand = new DelegateCommand<object>(Connect, CanConnect);
             StartStopCommand = new DelegateCommand<object>(StartStop, CanStartStop);
 
-            _aircraftInfoObservable = Observable.FromEventPattern<EventHandler<AircraftDataReceivedEventArgs>, AircraftDataReceivedEventArgs>(
-                    h => _provider.AircraftDataReceived += h,
-                    h => _provider.AircraftDataReceived -= h)
-                .Select(k => k.EventArgs.AircraftInfo);
-
-            WriteSequenceToView(_aircraftInfoObservable);
+            WriteSequenceToView(_trackLogManager.AircraftInfoObservable);
         }
 
         private void HandleConnectionChanged(object? sender, bool connectionStatus)
         {
+            _connected = connectionStatus;
+
             ConnectionStatusText = connectionStatus ? "CONNECTED" : "DISCONNECTED";
+            ConnectButtonText = connectionStatus ? "DISCONNECTED" : "CONNECT";
+            
+            ((DelegateCommand<object>)StartStopCommand).RaiseCanExecuteChanged();
         }
 
 
@@ -139,20 +134,11 @@ namespace FsTrackLogApp
             {
                 if (_connected)
                 {
-                    ConnectButtonText = "CONNECT";
-                    _provider.Stop();
-                    _connected = false;
+                    _trackLogManager.Stop();
                 }
                 else
                 {
-                    _provider.HostName = "192.168.1.174";
-                    _provider.Port = 500;
-                    _provider.Start();
-
-                    Status = "Connected";
-                    ConnectButtonText = "DISCONNECT";
-                    _connected = true;
-                    ((DelegateCommand<object>)StartStopCommand).RaiseCanExecuteChanged();
+                    _trackLogManager.Start();
                 }
             }
             catch (Exception e)
@@ -171,14 +157,13 @@ namespace FsTrackLogApp
             if (!_started)
             {
                 StartStopButtonText = "STOP";
-                _store.Initialize("c:\\temp\\FsTrackLog");
-                _aircraftInfoObservable.Subscribe(_store.Write, _store.Close);
+
                 _started = true;
             }
             else
             {
                 StartStopButtonText = "START";
-                _store.Close();
+
                 _started = false;
             }
         }

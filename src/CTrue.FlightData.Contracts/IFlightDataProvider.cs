@@ -14,5 +14,6 @@ namespace CTrue.Fs.FlightData.Contracts
         void Start();
         void Stop();
         void Initialize();
+        void Disconnect();
     }
 }
