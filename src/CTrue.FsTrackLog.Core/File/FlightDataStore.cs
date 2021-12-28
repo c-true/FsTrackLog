@@ -1,15 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 
 namespace CTrue.FsTrackLog.Core.File
 {
-    public interface IFlightDataStore
-    {
-        void Initialize(string directory);
-
-        IFsTrackLog CreateTrackLog();
-    }
-
     public class FlightDataStore : IFlightDataStore
     {
         DirectoryInfo _storeDirectory;
@@ -26,6 +20,13 @@ namespace CTrue.FsTrackLog.Core.File
         {
             var trackLogger = new TrackLogFileWriter(_storeDirectory.FullName);
             return new FsTrackLog(trackLogger);
+        }
+
+        public List<IFsTrackLog> GetTrackLogs()
+        {
+            var fileList = _storeDirectory.GetFiles("*.fst");
+
+
         }
     }
 }
