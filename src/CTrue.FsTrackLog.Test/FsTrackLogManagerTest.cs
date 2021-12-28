@@ -1,6 +1,6 @@
 ﻿using CTrue.Fs.FlightData.Contracts;
-using CTrue.Fs.FlightData.Store;
 using CTrue.FsTrackLog.Core;
+using CTrue.FsTrackLog.Core.File;
 using FakeItEasy;
 using NUnit.Framework;
 

@@ -1,25 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
 using System.IO;
-using System.Linq;
-using System.Reactive.Disposables;
 using System.Reactive.Linq;
-using System.Reactive.Subjects;
-using System.Runtime.Remoting.Channels;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using CommandLine;
 using CommandLine.Text;
 using CTrue.Fs.FlightData.Contracts;
 using CTrue.Fs.FlightData.Provider;
-using CTrue.Fs.FlightData.Store;
-using CTrue.FsConnect;
-using CTrue.FsConnect.Managers;
-using Microsoft.FlightSimulator.SimConnect;
-using SpatialLite.Gps.Geometries;
-using SpatialLite.Gps.IO;
+using CTrue.FsTrackLog.Core.File;
+using CTrue.FsTrackLog.Core.Gpx;
 
 namespace FsTrackLog
 {
@@ -27,7 +16,7 @@ namespace FsTrackLog
     {
         private static AutoResetEvent _resetEvent = new AutoResetEvent(false);
 
-        private static FsTrackLogger _trackLogger;
+        private static TrackLogFileWriter _trackLogger;
         private static string _fileName;
         private static bool _displayCharStar = true;
         private static int _sampleCount = 0;
@@ -76,7 +65,8 @@ namespace FsTrackLog
                 if (options.Verbose)
                     WriteSequenceToConsole(_aircraftInfoObservable);
 
-                _aircraftInfoObservable.Subscribe(_store.Write, _store.Close);
+                var trackLog = _store.CreateTrackLog();
+                _aircraftInfoObservable.Subscribe(trackLog.Write, trackLog.Close);
 
                 //
                 // Start Flight Data Provider

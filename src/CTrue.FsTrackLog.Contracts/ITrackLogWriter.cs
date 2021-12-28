@@ -5,11 +5,13 @@ namespace CTrue.FsTrackLog.Contracts
 {
     public interface ITrackLogWriter
     {
+        bool IsOpen { get; }
+
         /// <summary>
         /// Writes a data point to the track log.
         /// </summary>
         /// <param name="ai"></param>
-        void WriteNext(AircraftInfoV1 ai);
+        void Write(AircraftInfoV1 ai);
 
         void Close();
     }

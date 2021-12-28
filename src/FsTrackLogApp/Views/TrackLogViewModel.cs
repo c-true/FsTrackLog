@@ -9,7 +9,7 @@ using FsTrackLogApp.Annotations;
 
 namespace FsTrackLogApp
 {
-    public class AircraftInfoViewModel : INotifyPropertyChanged
+    public class TrackLogViewModel : INotifyPropertyChanged
     {
         private IFsTrackLog _model;
 
@@ -90,7 +90,7 @@ namespace FsTrackLogApp
 
         public ICommand ShowPosCommand { get; }
 
-        public AircraftInfoViewModel()
+        public TrackLogViewModel()
         {
             ShowPosCommand = new DelegateCommand<object>(ShowPos, CanShowPos);
         }

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 using CTrue.Fs.FlightData.Contracts;
-using CTrue.Fs.FlightData.Store;
+using CTrue.FsTrackLog.Core.File;
 using CTrue.FsTrackLog.Test.Resources;
 using FsTrackLog;
 using NUnit.Framework;
@@ -18,9 +18,9 @@ namespace CTrue.FsTrackLog.Test
             // Act
             MemoryStream ms = new MemoryStream();
 
-            FsTrackLogger writer = new FsTrackLogger(ms);
+            TrackLogFileWriter writer = new TrackLogFileWriter(ms);
 
-            writer.WriteNext(new AircraftInfoV1()
+            writer.Write(new AircraftInfoV1()
             {
                 Latitude = 60,
                 Longitude = 10,

@@ -1,11 +1,11 @@
 ﻿using System;
 using System.IO;
-using CTrue.Fs.FlightData.Store;
-using FsTrackLog.Proto.Generated.v1;
+using CTrue.FsTrackLog.Core.File;
+using CTrue.FsTrackLog.Core.File.Generated.v1;
 using SpatialLite.Gps.Geometries;
 using SpatialLite.Gps.IO;
 
-namespace FsTrackLog
+namespace CTrue.FsTrackLog.Core.Gpx
 {
     public class FsGpxWriter
     {

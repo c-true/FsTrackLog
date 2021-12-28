@@ -1,6 +1,6 @@
 ﻿using System.IO;
+using CTrue.FsTrackLog.Core.Gpx;
 using CTrue.FsTrackLog.Test.Resources;
-using FsTrackLog;
 using NUnit.Framework;
 using SpatialLite.Gps.Geometries;
 using SpatialLite.Gps.IO;

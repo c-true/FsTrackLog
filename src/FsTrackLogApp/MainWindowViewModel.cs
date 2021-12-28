@@ -1,14 +1,10 @@
 ﻿using System;
 using System.ComponentModel;
-using System.Diagnostics.Eventing.Reader;
-using System.Reactive.Linq;
-using System.Reactive.Subjects;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
-using CTrue.Fs.FlightData.Contracts;
 using CTrue.Fs.FlightData.Provider;
-using CTrue.Fs.FlightData.Store;
 using CTrue.FsTrackLog.Core;
+using CTrue.FsTrackLog.Core.File;
 using FsTrackLogApp.Annotations;
 using Serilog;
 
@@ -25,8 +21,8 @@ namespace FsTrackLogApp
         private string _connectionStatusText = "DISCONNECTED";
         private string _startStopButtonText = "START";
         private string _connectButtonText;
-        private AircraftInfoViewModel _aircraftInfo;
-        private AircraftInfoViewModel _trackLogViewModel;
+        private TrackLogViewModel _trackLog;
+        private TrackLogViewModel _trackLogViewModel;
 
         public ICommand ConnectCommand { get; }
         public ICommand StartStopCommand { get; }
@@ -75,12 +71,12 @@ namespace FsTrackLogApp
             }
         }
 
-        public AircraftInfoViewModel AircraftInfo
+        public TrackLogViewModel TrackLog
         {
-            get => _aircraftInfo;
+            get => _trackLog;
             set
             {
-                _aircraftInfo = value;
+                _trackLog = value;
                 OnPropertyChanged();
             }
         }
@@ -109,7 +105,7 @@ namespace FsTrackLogApp
                 Log.Error("Could not initialize track log manager.", e);
             }
 
-            AircraftInfo = new AircraftInfoViewModel();
+            TrackLog = new TrackLogViewModel();
 
             ConnectButtonText = "CONNECT";
             StartStopButtonText = "START";
@@ -117,7 +113,7 @@ namespace FsTrackLogApp
             StartStopCommand = new DelegateCommand<object>(StartStop, CanStartStop);
         }
 
-        private void HandleConnectionChanged(object? sender, bool connectionStatus)
+        private void HandleConnectionChanged(object sender, bool connectionStatus)
         {
             _connected = connectionStatus;
 
@@ -127,13 +123,13 @@ namespace FsTrackLogApp
             ((DelegateCommand<object>)StartStopCommand).RaiseCanExecuteChanged();
         }
 
-        private void HandleCurrentTrackLogChanged(object? sender, IFsTrackLog trackLog)
+        private void HandleCurrentTrackLogChanged(object sender, IFsTrackLog trackLog)
         {
-            TrackLogViewModel = new AircraftInfoViewModel();
+            TrackLogViewModel = new TrackLogViewModel();
             TrackLogViewModel.SetModel(trackLog);
         }
 
-        public AircraftInfoViewModel TrackLogViewModel
+        public TrackLogViewModel TrackLogViewModel
         {
             get => _trackLogViewModel;
             set

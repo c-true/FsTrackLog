@@ -1,5 +1,5 @@
 ﻿syntax = "proto3";  
-option csharp_namespace = "FsTrackLog.Proto.Generated.v2";  
+option csharp_namespace = "CTrue.FsTrackLog.Core.File.Generated.v2";  
 
 message FsTrackPoint  
 {  

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Reactive.Linq;
 using CTrue.Fs.FlightData.Contracts;
-using CTrue.Fs.FlightData.Store;
+using IFlightDataStore = CTrue.FsTrackLog.Core.File.IFlightDataStore;
 
 namespace CTrue.FsTrackLog.Core
 {
@@ -19,7 +19,7 @@ namespace CTrue.FsTrackLog.Core
     {
         private readonly IFlightDataProvider _provider;
         private readonly IFlightDataStore _store;
-        private FsTrackLog _currentTrackLog;
+        private IFsTrackLog _currentTrackLog;
 
         private IObservable<AircraftInfoV1> _aircraftInfoObservable;
 
@@ -72,7 +72,7 @@ namespace CTrue.FsTrackLog.Core
         {
             if (_currentTrackLog == null)
             {
-                _currentTrackLog = new FsTrackLog(_store);
+                _currentTrackLog = _store.CreateTrackLog();
                 CurrentTrackLogChanged?.Invoke(this, _currentTrackLog);
             }
 

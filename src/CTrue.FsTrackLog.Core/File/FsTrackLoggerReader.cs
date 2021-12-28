@@ -1,8 +1,8 @@
 ﻿using System.IO;
-using FsTrackLog.Proto.Generated;
-using FsTrackLog.Proto.Generated.v1;
+using CTrue.FsTrackLog.Core.File.Generated;
+using CTrue.FsTrackLog.Core.File.Generated.v1;
 
-namespace CTrue.Fs.FlightData.Store
+namespace CTrue.FsTrackLog.Core.File
 {
     public class FsTrackLoggerReader
     {

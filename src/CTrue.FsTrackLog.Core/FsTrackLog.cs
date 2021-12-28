@@ -1,19 +1,13 @@
 ﻿using System;
 using CTrue.Fs.FlightData.Contracts;
-using CTrue.Fs.FlightData.Store;
+using CTrue.FsTrackLog.Contracts;
+using IFlightDataStore = CTrue.FsTrackLog.Core.File.IFlightDataStore;
 
 namespace CTrue.FsTrackLog.Core
 {
-    public interface IFsTrackLog
-    {
-        event EventHandler TrackLogUpdated;
-
-        AircraftInfoV1 Value { get; set; }
-    }
-
     public class FsTrackLog : IFsTrackLog
     {
-        private readonly IFlightDataStore _store;
+        private readonly ITrackLogWriter _writer;
 
         public event EventHandler TrackLogUpdated;
 
@@ -23,9 +17,9 @@ namespace CTrue.FsTrackLog.Core
 
         public AircraftInfoV1 Value { get; set; }
 
-        public FsTrackLog(IFlightDataStore store)
+        public FsTrackLog(ITrackLogWriter writer)
         {
-            _store = store ?? throw new ArgumentNullException(nameof(store));
+            _writer = writer ?? throw new ArgumentNullException(nameof(writer));
             FsTrackLogId = Guid.NewGuid().ToString();
         }
 
@@ -33,14 +27,14 @@ namespace CTrue.FsTrackLog.Core
         {
             Value = value;
 
-            _store.Write(value);
+            _writer.Write(value);
             
             TrackLogUpdated?.Invoke(this, EventArgs.Empty);
         }
 
         public void Close()
         {
-            _store.Close();
+            _writer.Close();
         }
     }
 }

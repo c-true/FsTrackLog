@@ -2,13 +2,13 @@
 using System.IO;
 using CTrue.Fs.FlightData.Contracts;
 using CTrue.FsTrackLog.Contracts;
-using FsTrackLog.Proto.Generated;
-using FsTrackLog.Proto.Generated.v1;
+using CTrue.FsTrackLog.Core.File.Generated;
+using CTrue.FsTrackLog.Core.File.Generated.v1;
 using Google.Protobuf;
 
-namespace CTrue.Fs.FlightData.Store
+namespace CTrue.FsTrackLog.Core.File
 {
-    public class FsTrackLogger : ITrackLogWriter
+    public class TrackLogFileWriter : ITrackLogWriter
     {
         private const byte FSTRACKLOG_BINARY_VERSION = 0x01;
 
@@ -16,7 +16,7 @@ namespace CTrue.Fs.FlightData.Store
 
         public string FileName { get; }
 
-        public FsTrackLogger(string directoryName)
+        public TrackLogFileWriter(string directoryName)
         {
             DirectoryInfo di = new DirectoryInfo(directoryName);
 
@@ -29,7 +29,7 @@ namespace CTrue.Fs.FlightData.Store
             Initialize();
         }
         
-        public FsTrackLogger(Stream stream)
+        public TrackLogFileWriter(Stream stream)
         {
             _stream = stream;
 
@@ -47,14 +47,17 @@ namespace CTrue.Fs.FlightData.Store
 			
         }
 
+        public bool IsOpen => _stream != null;
+
         public void Close()
         {
             _stream?.Flush();
             _stream?.Close();
+            _stream = null;
         }
         
 
-        public void WriteNext(AircraftInfoV1 value)
+        public void Write(AircraftInfoV1 value)
         {
             var tp = GetAircraftInfoBytes(value);
             tp.WriteDelimitedTo(_stream);
