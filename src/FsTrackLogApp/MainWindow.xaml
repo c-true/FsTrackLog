@@ -5,7 +5,7 @@
     xmlns:local="clr-namespace:FsTrackLogApp"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     Title="Flight Simulator Track Log"
-    Width="400"
+    Width="600"
     Height="450"
     mc:Ignorable="d">
     <Window.DataContext>
@@ -22,7 +22,7 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="300" />
+            <ColumnDefinition Width="450" />
             <ColumnDefinition Width="200" />
             <ColumnDefinition />
         </Grid.ColumnDefinitions>
@@ -53,6 +53,9 @@
             <ListView.ItemTemplate>
                 <DataTemplate>
                     <WrapPanel>
+                        <TextBlock Text="Time: " />
+                        <TextBlock FontWeight="Bold" Text="{Binding TimeStamp}" />
+                        <TextBlock Text=", " />
                         <TextBlock Text="Title: " />
                         <TextBlock FontWeight="Bold" Text="{Binding Title}" />
                         <TextBlock Text=", " />
@@ -64,7 +67,7 @@
                         </TextBlock>
                         <TextBlock Text=" ," />
                         <TextBlock Text=" Alt: " />
-                        <TextBlock Text="{Binding Altitude}" />
+                        <TextBlock FontWeight="Bold" Text="{Binding Altitude}" />
                     </WrapPanel>
                 </DataTemplate>
             </ListView.ItemTemplate>

@@ -19,8 +19,20 @@ namespace FsTrackLogApp
         private string _heading;
         private bool _simOnGround;
         private string _title;
+        private string _timeStamp;
 
         public event PropertyChangedEventHandler PropertyChanged;
+
+        public string TimeStamp
+        {
+            get => _timeStamp;
+            set
+            {
+                if (value == _timeStamp) return;
+                _timeStamp = value;
+                OnPropertyChanged();
+            }
+        }
 
         public string Title
         {
@@ -126,6 +138,7 @@ namespace FsTrackLogApp
 
         private void UpdateViewModel()
         {
+            TimeStamp = _model.Value.TimeStamp.ToString("s");
             Title = _model.Value.Title;
             Position = $"({_model.Value.Latitude.ToString("F3")}, {_model.Value.Longitude.ToString("F3")})";
             Altitude = $"{_model.Value.Altitude.ToString("F0")}ft ({_model.Value.AltitudeAboveGround.ToString("F0")}ft ag)";
