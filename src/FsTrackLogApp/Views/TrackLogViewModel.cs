@@ -115,6 +115,9 @@ namespace FsTrackLogApp
         public void SetModel(IFsTrackLog tracklog)
         {
             _model = tracklog;
+
+            UpdateViewModel();
+
             _model.TrackLogUpdated += (sender, args) =>
             {
                 UpdateViewModel();

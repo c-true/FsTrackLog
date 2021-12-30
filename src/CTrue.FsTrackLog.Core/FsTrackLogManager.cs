@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Reactive.Linq;
 using CTrue.Fs.FlightData.Contracts;
 using IFlightDataStore = CTrue.FsTrackLog.Core.IFlightDataStore;
@@ -13,6 +14,8 @@ namespace CTrue.FsTrackLog.Core
         void Initialize(FsTrackLogConfig config);
         void Start();
         void Stop();
+        
+        List<IFsTrackLog> GetTrackLogs();
     }
 
     public class FsTrackLogManager : IFsTrackLogManager
@@ -66,6 +69,11 @@ namespace CTrue.FsTrackLog.Core
         public void Stop()
         {
             _provider.Stop();
+        }
+
+        public List<IFsTrackLog> GetTrackLogs()
+        {
+            return _store.GetTrackLogs();
         }
 
         private void onNext(AircraftInfoV1 value)

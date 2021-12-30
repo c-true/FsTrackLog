@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Reactive;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
 using CTrue.Fs.FlightData.Provider;
@@ -81,6 +83,8 @@ namespace FsTrackLogApp
             }
         }
 
+        public ObservableCollection<TrackLogViewModel> TrackLogs { get; set; }
+
         public MainWindowViewModel()
         {
             try
@@ -99,6 +103,8 @@ namespace FsTrackLogApp
                 };
 
                 _trackLogManager.Initialize(config);
+                
+                TrackLogs = new ObservableCollection<TrackLogViewModel>(_trackLogManager.GetTrackLogs().ConvertAll(ConvertToViewModel));
             }
             catch (Exception e)
             {
@@ -111,6 +117,14 @@ namespace FsTrackLogApp
             StartStopButtonText = "START";
             ConnectCommand = new DelegateCommand<object>(Connect, CanConnect);
             StartStopCommand = new DelegateCommand<object>(StartStop, CanStartStop);
+        }
+
+        private TrackLogViewModel ConvertToViewModel(IFsTrackLog trackLog)
+        {
+            var vm = new TrackLogViewModel();
+            vm.SetModel(trackLog);
+
+            return vm;
         }
 
         private void HandleConnectionChanged(object sender, bool connectionStatus)
