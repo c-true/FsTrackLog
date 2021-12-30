@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Reactive.Linq;
 using CTrue.Fs.FlightData.Contracts;
-using IFlightDataStore = CTrue.FsTrackLog.Core.File.IFlightDataStore;
+using IFlightDataStore = CTrue.FsTrackLog.Core.IFlightDataStore;
 
 namespace CTrue.FsTrackLog.Core
 {

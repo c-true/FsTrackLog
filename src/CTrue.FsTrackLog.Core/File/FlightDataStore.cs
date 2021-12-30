@@ -24,9 +24,25 @@ namespace CTrue.FsTrackLog.Core.File
 
         public List<IFsTrackLog> GetTrackLogs()
         {
+            List<IFsTrackLog> trackLogs = new List<IFsTrackLog>();
+
             var fileList = _storeDirectory.GetFiles("*.fst");
 
+            foreach (var fileInfo in fileList)
+            {
+                FsTrackLogFileReader reader = new FsTrackLogFileReader(fileInfo.FullName);
 
+                FsTrackLog trackLog = new FsTrackLog(reader);
+                
+                if(reader.Version != 1)
+                    continue;
+
+                trackLog.Read();
+
+                trackLogs.Add(trackLog);
+            }
+
+            return trackLogs;
         }
     }
 }

@@ -36,7 +36,7 @@ namespace CTrue.FsTrackLog.Test
 
             ms.Position = 0;
 
-            FsTrackLoggerReader reader = new FsTrackLoggerReader(ms);
+            FsTrackLogFileReader reader = new FsTrackLogFileReader(ms);
 
             var tp = reader.ReadNext();
 
@@ -62,7 +62,7 @@ namespace CTrue.FsTrackLog.Test
 
             MemoryStream ms = new MemoryStream(testData);
 
-            FsTrackLoggerReader reader = new FsTrackLoggerReader(ms);
+            FsTrackLogFileReader reader = new FsTrackLogFileReader(ms);
 
             Assert.That(reader.Version, Is.EqualTo(1));
 

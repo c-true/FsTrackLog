@@ -41,7 +41,7 @@ namespace CTrue.FsTrackLog.Core.Gpx
 
                 bool quit = false;
 
-                FsTrackLoggerReader reader = new FsTrackLoggerReader(sourceStream);
+                FsTrackLogFileReader reader = new FsTrackLogFileReader(sourceStream);
                 
                 Console.WriteLine("Reading binary file, version: " + reader.Version);
 

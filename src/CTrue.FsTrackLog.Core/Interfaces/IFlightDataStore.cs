@@ -1,4 +1,4 @@
-﻿namespace CTrue.FsTrackLog.Core.File
+﻿namespace CTrue.FsTrackLog.Core
 {
     public interface IFlightDataStore
     {

@@ -4,7 +4,7 @@ using CTrue.FsTrackLog.Core.File.Generated.v1;
 
 namespace CTrue.FsTrackLog.Core.File
 {
-    public class FsTrackLoggerReader
+    public class FsTrackLogFileReader : ITrackLogReader
     {
         private Stream _stream;
 
@@ -12,16 +12,23 @@ namespace CTrue.FsTrackLog.Core.File
 
         public int Version => _header.Version;
 
-        public FsTrackLoggerReader(string fileName)
+        public FsTrackLogFileReader(string fileName)
         {
             _stream = new FileStream(fileName, FileMode.Open, FileAccess.Read);
+
+            _header = FsTrackLogHeader.Parser.ParseDelimitedFrom(_stream);
         }
 
-        public FsTrackLoggerReader(Stream stream)
+        public FsTrackLogFileReader(Stream stream)
         {
             _stream = stream;
 
             _header = FsTrackLogHeader.Parser.ParseDelimitedFrom(_stream);
+        }
+
+        public bool CanReadNext()
+        {
+            return _stream.Position < _stream.Length;
         }
 
         public FsTrackPoint ReadNext()
