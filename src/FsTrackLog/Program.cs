@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Reactive.Linq;
+using System.Reflection;
 using System.Threading;
 using CommandLine;
 using CommandLine.Text;
@@ -14,11 +15,6 @@ namespace FsTrackLog
 {
     class Program
     {
-        private static AutoResetEvent _resetEvent = new AutoResetEvent(false);
-
-        private static TrackLogFileWriter _trackLogger;
-        private static string _fileName;
-        private static bool _displayCharStar = true;
         private static int _sampleCount = 0;
 
         private const byte FSTRACKLOG_BINARY_VERSION = 0x01;
@@ -66,7 +62,7 @@ namespace FsTrackLog
                     WriteSequenceToConsole(_aircraftInfoObservable);
 
                 var trackLog = _store.CreateTrackLog();
-                _aircraftInfoObservable.Subscribe(trackLog.Write, trackLog.Close);
+                var disposable = _aircraftInfoObservable.Subscribe(trackLog.Write, trackLog.Close);
 
                 //
                 // Start Flight Data Provider
@@ -74,6 +70,8 @@ namespace FsTrackLog
 
                 _provider.HostName = options.Hostname;
                 _provider.Port = options.Port;
+
+                _provider.Initialize();
                 _provider.Start();
 
                 ConsoleKeyInfo cki;
@@ -87,6 +85,10 @@ namespace FsTrackLog
 
                     cki = Console.ReadKey();
                 } while (cki.Key != ConsoleKey.Escape);
+
+                // Event pattern on Observable does not close observable, so must close tracklog explicitly
+                trackLog.Close();
+                disposable.Dispose();
             }
             catch (Exception e)
             {
@@ -151,12 +153,18 @@ namespace FsTrackLog
                 {
                     //configure help
                     h.AdditionalNewLineAfterOption = false;
-                    h.Heading = "Flight Simulator Track Log v1.0.1";
+                    h.Heading = "Flight Simulator Track Log v" + GetAssemblyVersion();
                     h.Copyright = "";
                     return HelpText.DefaultParsingErrorsHandler(result, h);
                 }, e => e);
             }
+
             Console.WriteLine(helpText);
+        }
+
+        private static string GetAssemblyVersion()
+        {
+            return Assembly.GetEntryAssembly().GetName().Version.ToString();
         }
     }
 }

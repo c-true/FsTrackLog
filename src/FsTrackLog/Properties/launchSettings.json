@@ -2,11 +2,11 @@
   "profiles": {
     "Write": {
       "commandName": "Project",
-      "commandLineArgs": "-h 192.168.1.174 -p 57490 -v -g -d \"c:\\temp\\FsTrackLog"
+      "commandLineArgs": "-h 192.168.1.174 -p 500 -v -g -d \"c:\\temp\\FsTrackLog\""
     },
     "Read": {
       "commandName": "Project",
-      "commandLineArgs": "-h 192.168.1.174 -p 57490 -f \"c:\\temp\\FsTrackLog\\FsTrackLog_20210411091305.fst"
+      "commandLineArgs": "-h 192.168.1.174 -p 500 -g -f \"c:\\temp\\FsTrackLog\\FsTrackLog_20221112113558.fst\""
     }
   }
 }
