@@ -2,10 +2,11 @@
 
 namespace CTrue.Fs.FlightData.Contracts
 {
-    public struct AircraftInfoV1
+    public struct AircraftInfo
     {
         public string Title;
-        public string Category;
+        public string AtcId;
+        public string AtcModel;
         public DateTime TimeStamp;
         public double Latitude;
         public double Longitude;
@@ -15,5 +16,8 @@ namespace CTrue.Fs.FlightData.Contracts
         public double Speed;
 
         public bool SimOnGround;
+        public bool AutopilotMaster;
+        public double FuelTotalQuantity;
+        public double FuelTotalCapacity;
     }
 }

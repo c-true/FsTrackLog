@@ -1,8 +1,7 @@
 ﻿using System;
 using CTrue.Fs.FlightData.Contracts;
 using CTrue.FsTrackLog.Contracts;
-using CTrue.FsTrackLog.Core.File;
-using CTrue.FsTrackLog.Core.File.Generated.v1;
+using CTrue.FsTrackLog.Proto.v2;
 using IFlightDataStore = CTrue.FsTrackLog.Core.IFlightDataStore;
 
 namespace CTrue.FsTrackLog.Core
@@ -16,9 +15,7 @@ namespace CTrue.FsTrackLog.Core
 
         public string FsTrackLogId { get; }
 
-        public string AircraftName { get; set; }
-
-        public AircraftInfoV1 Value { get; set; }
+        public AircraftInfo Value { get; set; }
 
         public FsTrackLog(ITrackLogWriter writer)
         {
@@ -31,7 +28,7 @@ namespace CTrue.FsTrackLog.Core
             _reader = reader ?? throw new ArgumentNullException(nameof(reader));
         }
 
-        public void Write(AircraftInfoV1 value)
+        public void Write(AircraftInfo value)
         {
             Value = value;
 
@@ -47,30 +44,28 @@ namespace CTrue.FsTrackLog.Core
             if (trackPoint == null)
                 return;
 
-            Value = trackPoint.ToAircraftInfoV1();
-        }
-
-        public void Close()
-        {
-            _writer.Close();
-        }
-    }
-
-    public static class FsTrackPointExtensions
-    {
-        public static AircraftInfoV1 ToAircraftInfoV1(this FsTrackPoint trackPoint)
-        {
-            return new AircraftInfoV1()
+            Value = new AircraftInfo()
             {
-                Title = "",
+                Title = _reader.Title,
+                AtcId = _reader.AtcId,
+                AtcModel = _reader.AtcModel,
+                FuelTotalCapacity = _reader.FuelTotalCapacity,
                 TimeStamp = DateTime.FromBinary(trackPoint.Time),
                 Latitude = trackPoint.Latitude,
                 Longitude = trackPoint.Longitude,
                 Altitude = trackPoint.Altitude,
                 AltitudeAboveGround = trackPoint.AltitudeAboveGround,
                 Heading = trackPoint.Heading,
-                Speed = trackPoint.Speed
+                Speed = trackPoint.Speed,
+                SimOnGround = trackPoint.SimOnGround,
+                AutopilotMaster = trackPoint.AutopilotMaster,
+                FuelTotalQuantity = trackPoint.FuelTotalQuantity
             };
+        }
+
+        public void Close()
+        {
+            _writer.Close();
         }
     }
 }

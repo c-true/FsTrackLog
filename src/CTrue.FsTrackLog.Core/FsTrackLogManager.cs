@@ -24,7 +24,7 @@ namespace CTrue.FsTrackLog.Core
         private readonly IFlightDataStore _store;
         private IFsTrackLog _currentTrackLog;
 
-        private IObservable<AircraftInfoV1> _aircraftInfoObservable;
+        private IObservable<AircraftInfo> _aircraftInfoObservable;
 
         public event EventHandler<bool> ConnectionChanged;
 
@@ -76,7 +76,7 @@ namespace CTrue.FsTrackLog.Core
             return _store.GetTrackLogs();
         }
 
-        private void onNext(AircraftInfoV1 value)
+        private void onNext(AircraftInfo value)
         {
             if (_currentTrackLog == null)
             {

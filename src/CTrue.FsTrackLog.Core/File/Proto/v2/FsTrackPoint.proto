@@ -1,5 +1,5 @@
 ﻿syntax = "proto3";  
-option csharp_namespace = "CTrue.FsTrackLog.Core.File.Generated.v2";  
+option csharp_namespace = "CTrue.FsTrackLog.Proto.v2";
 
 message FsTrackPoint  
 {  
@@ -10,4 +10,7 @@ message FsTrackPoint
 	double AltitudeAboveGround = 5;
     double Heading = 6;
     double Speed = 7;
+    bool SimOnGround = 8;
+    bool AutopilotMaster = 9;
+    double FuelTotalQuantity = 10;
 }

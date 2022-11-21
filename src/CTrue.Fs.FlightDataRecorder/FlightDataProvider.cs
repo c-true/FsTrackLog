@@ -128,12 +128,13 @@ namespace CTrue.Fs.FlightData.Provider
             _connectTimer.Change(1000, 0);
         }
 
-        private AircraftInfoV1 ConvertToDataFormat(PlaneInfo value)
+        private AircraftInfo ConvertToDataFormat(PlaneInfo value)
         {
-            return new AircraftInfoV1()
+            return new AircraftInfo()
             {
                 Title = value.Title,
-                Category = value.Category,
+                AtcId = value.AtcId,
+                AtcModel = value.AtcModel,
                 TimeStamp = GetDateTime(value.ZuluYear, value.ZuluDayOfYear, value.ZuluTime),
                 Latitude = value.Latitude,
                 Longitude = value.Longitude,
@@ -141,7 +142,10 @@ namespace CTrue.Fs.FlightData.Provider
                 AltitudeAboveGround = value.AltitudeAboveGround,
                 Heading = value.Heading,
                 Speed = value.Speed,
-                SimOnGround = value.SimOnGround
+                SimOnGround = value.SimOnGround,
+                AutopilotMaster = value.AutopilotMaster,
+                FuelTotalQuantity = value.FuelTotalQuantity,
+                FuelTotalCapacity = value.FuelTotalCapacity
             };
         }
 

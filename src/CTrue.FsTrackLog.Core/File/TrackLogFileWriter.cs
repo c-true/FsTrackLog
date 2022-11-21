@@ -2,17 +2,18 @@
 using System.IO;
 using CTrue.Fs.FlightData.Contracts;
 using CTrue.FsTrackLog.Contracts;
-using CTrue.FsTrackLog.Core.File.Generated;
-using CTrue.FsTrackLog.Core.File.Generated.v1;
+using CTrue.FsTrackLog.Proto;
+using CTrue.FsTrackLog.Proto.v2;
 using Google.Protobuf;
 
 namespace CTrue.FsTrackLog.Core.File
 {
     public class TrackLogFileWriter : ITrackLogWriter
     {
-        private const byte FSTRACKLOG_BINARY_VERSION = 0x01;
+        private const byte FSTRACKLOG_BINARY_VERSION = 0x02;
 
         private Stream _stream;
+        private bool _headerWritten = false;
 
         public string FileName { get; }
 
@@ -38,13 +39,12 @@ namespace CTrue.FsTrackLog.Core.File
 
         private void Initialize()
         {
-            FsTrackLogHeader header = new FsTrackLogHeader()
+            FsTrackLogFileHeader header = new FsTrackLogFileHeader()
             {
                 Version = FSTRACKLOG_BINARY_VERSION
             };
 
             header.WriteDelimitedTo(_stream);
-			
         }
 
         public bool IsOpen => _stream != null;
@@ -56,11 +56,29 @@ namespace CTrue.FsTrackLog.Core.File
             _stream = null;
         }
         
-
-        public void Write(AircraftInfoV1 value)
+        public void Write(AircraftInfo value)
         {
+            if (!_headerWritten)
+            {
+                WriteTrackLogHeader(value);
+                _headerWritten = true;
+            }
+
             var tp = GetAircraftInfoBytes(value);
             tp.WriteDelimitedTo(_stream);
+        }
+
+        private void WriteTrackLogHeader(AircraftInfo value)
+        {
+            FsTrackLogHeader trackLogHeader = new FsTrackLogHeader()
+            {
+                Title = value.Title,
+                AtcId = value.AtcId,
+                AtcModel = value.AtcModel,
+                FuelTotalCapacity = value.FuelTotalCapacity
+            };
+
+            trackLogHeader.WriteDelimitedTo(_stream);
         }
 
         private static string GetFileName()
@@ -68,7 +86,7 @@ namespace CTrue.FsTrackLog.Core.File
             return $"FsTrackLog_{DateTime.Now.ToString("yyyyMMddhhmmss")}.fst";
         }
 
-        private static FsTrackPoint GetAircraftInfoBytes(AircraftInfoV1 value)
+        private static FsTrackPoint GetAircraftInfoBytes(AircraftInfo value)
         {
             FsTrackPoint tp = new FsTrackPoint();
 

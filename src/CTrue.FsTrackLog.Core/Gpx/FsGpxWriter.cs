@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 using CTrue.FsTrackLog.Core.File;
-using CTrue.FsTrackLog.Core.File.Generated.v1;
+using CTrue.FsTrackLog.Proto.v2;
 using SpatialLite.Gps.Geometries;
 using SpatialLite.Gps.IO;
 

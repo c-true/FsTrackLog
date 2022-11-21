@@ -11,7 +11,7 @@ namespace CTrue.FsTrackLog.Contracts
         /// Writes a data point to the track log.
         /// </summary>
         /// <param name="ai"></param>
-        void Write(AircraftInfoV1 ai);
+        void Write(AircraftInfo ai);
 
         void Close();
     }

@@ -20,7 +20,7 @@ namespace CTrue.FsTrackLog.Test
 
             TrackLogFileWriter writer = new TrackLogFileWriter(ms);
 
-            writer.Write(new AircraftInfoV1()
+            writer.Write(new AircraftInfo()
             {
                 Latitude = 60,
                 Longitude = 10,

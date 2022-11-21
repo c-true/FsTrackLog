@@ -17,8 +17,6 @@ namespace FsTrackLog
     {
         private static int _sampleCount = 0;
 
-        private const byte FSTRACKLOG_BINARY_VERSION = 0x01;
-
         static void Main(string[] args)
         {
             Parser parser = new Parser(with => with.HelpWriter = null);
@@ -31,7 +29,7 @@ namespace FsTrackLog
 
         private static void Run(Options options)
         {
-            IObservable<AircraftInfoV1> _aircraftInfoObservable;
+            IObservable<AircraftInfo> _aircraftInfoObservable;
             FlightDataProvider _provider = new FlightDataProvider();
             FlightDataStore _store = new FlightDataStore();
 
@@ -116,7 +114,7 @@ namespace FsTrackLog
             }
         }
 
-        static void WriteSequenceToConsole(IObservable<AircraftInfoV1> sequence)
+        static void WriteSequenceToConsole(IObservable<AircraftInfo> sequence)
         {
             sequence.Subscribe(value =>
             {

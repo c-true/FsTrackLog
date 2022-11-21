@@ -1,0 +1,10 @@
+﻿syntax = "proto3";  
+option csharp_namespace = "CTrue.FsTrackLog.Proto.v2";
+
+message FsTrackLogHeader
+{
+	string Title = 1;
+	string AtcId = 2;
+	string AtcModel = 3;
+	double FuelTotalCapacity = 4;
+}

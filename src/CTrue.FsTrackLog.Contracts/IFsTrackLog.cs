@@ -7,8 +7,8 @@ namespace CTrue.FsTrackLog.Core
     {
         event EventHandler TrackLogUpdated;
 
-        AircraftInfoV1 Value { get; set; }
-        void Write(AircraftInfoV1 value);
+        AircraftInfo Value { get; set; }
+        void Write(AircraftInfo value);
         void Close();
     }
 }

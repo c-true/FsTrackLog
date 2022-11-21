@@ -1,8 +1,12 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+﻿	<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="File\Proto\v2\FsTrackLogHeader.proto" />
+  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\CTrue.FlightData.Contracts\CTrue.Fs.FlightData.Contracts.csproj" />
@@ -20,7 +24,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Protobuf Include="File\Proto\FsTrackLogHeader.proto" GrpcServices="Client" />
+    <Protobuf Include="File\Proto\FsTrackLogFileHeader.proto" GrpcServices="Client" />
+    <Protobuf Include="File\Proto\v2\FsTrackLogHeader.proto" GrpcServices="Client" />
     <Protobuf Include="File\Proto\v2\FsTrackPoint.proto" GrpcServices="Client" />
     <Protobuf Include="File\Proto\v1\FsTrackPoint.proto" GrpcServices="Client" />
   </ItemGroup>
