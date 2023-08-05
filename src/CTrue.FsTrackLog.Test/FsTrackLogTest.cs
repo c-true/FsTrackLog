@@ -22,6 +22,9 @@ namespace CTrue.FsTrackLog.Test
 
             writer.Write(new AircraftInfo()
             {
+                Title = "A",
+                AtcId = "B",
+                AtcModel = "C",
                 Latitude = 60,
                 Longitude = 10,
                 Altitude = 100,
@@ -29,7 +32,9 @@ namespace CTrue.FsTrackLog.Test
                 Heading = 10,
                 Speed = 20,
                 SimOnGround = false,
-                TimeStamp = new DateTime(2021, 1, 11, 0, 16, 40)
+                TimeStamp = new DateTime(2021, 1, 11, 0, 16, 40),
+                FuelTotalCapacity = 60,
+                FuelTotalQuantity = 40
             });
 
             //writer.Close();
@@ -38,18 +43,25 @@ namespace CTrue.FsTrackLog.Test
 
             FsTrackLogFileReader reader = new FsTrackLogFileReader(ms);
 
+            Assert.That(reader.Version, Is.EqualTo(2));
+            Assert.That(reader.Title, Is.EqualTo("A"));
+            Assert.That(reader.AtcId, Is.EqualTo("B"));
+            Assert.That(reader.AtcModel, Is.EqualTo("C"));
+            Assert.That(reader.FuelTotalCapacity, Is.EqualTo(60));
+
             var tp = reader.ReadNext();
 
             // Assert
-            
-            Assert.That(DateTime.FromBinary(tp.Time), Is.EqualTo(new DateTime(2021, 1, 11, 0, 16, 40)));
+
             Assert.That(tp, Is.Not.Null);
+            Assert.That(DateTime.FromBinary(tp.Time), Is.EqualTo(new DateTime(2021, 1, 11, 0, 16, 40)));
             Assert.That(tp.Latitude, Is.EqualTo(60));
             Assert.That(tp.Longitude, Is.EqualTo(10));
             Assert.That(tp.Altitude, Is.EqualTo(100));
             Assert.That(tp.AltitudeAboveGround, Is.EqualTo(50));
             Assert.That(tp.Heading, Is.EqualTo(10));
             Assert.That(tp.Speed, Is.EqualTo(20));
+            Assert.That(tp.FuelTotalQuantity, Is.EqualTo(40));
 
             var tp2 = reader.ReadNext();
             Assert.That(tp2, Is.Null);

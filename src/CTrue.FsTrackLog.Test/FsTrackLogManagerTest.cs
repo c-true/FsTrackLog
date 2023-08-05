@@ -19,7 +19,7 @@ namespace CTrue.FsTrackLog.Test
             var config = new FsTrackLogConfig()
             {
                 HostName = "192.168.1.174",
-                Port = 57490,
+                Port = 500,
                 AutoConnect = true,
                 AutoLog = true,
                 StorePath = "c:\\temp\\FsTrackLog"

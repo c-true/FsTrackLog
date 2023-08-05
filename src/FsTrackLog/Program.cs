@@ -118,7 +118,7 @@ namespace FsTrackLog
         {
             sequence.Subscribe(value =>
             {
-                Console.WriteLine($"({value.Latitude:F3}, {value.Longitude:F3}), Elev: {value.Altitude:F0}m, On ground: {value.SimOnGround}");
+                Console.WriteLine($"({value.Latitude:F3}, {value.Longitude:F3}), Elev: {value.Altitude:F0}m / {value.Altitude*3.2808399d:F0}ft, On ground: {value.SimOnGround}");
             }, () =>
             {
                 Console.WriteLine("Completed");
