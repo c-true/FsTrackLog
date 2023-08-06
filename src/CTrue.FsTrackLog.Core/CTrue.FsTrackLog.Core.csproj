@@ -1,0 +1,33 @@
+﻿	<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="File\Proto\v2\FsTrackLogHeader.proto" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\CTrue.FlightData.Contracts\CTrue.Fs.FlightData.Contracts.csproj" />
+    <ProjectReference Include="..\CTrue.FsTrackLog.Contracts\CTrue.FsTrackLog.Contracts.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="System.Reactive" Version="5.0.0" />
+    <PackageReference Include="Serilog" Version="2.10.0" />
+    <PackageReference Include="Google.Protobuf" Version="3.15.7" />
+    <PackageReference Include="Google.Protobuf.Tools" Version="3.15.7" />
+    <PackageReference Include="Grpc.Tools" Version="2.36.4">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Protobuf Include="File\Proto\FsTrackLogFileHeader.proto" GrpcServices="Client" />
+    <Protobuf Include="File\Proto\v2\FsTrackLogHeader.proto" GrpcServices="Client" />
+    <Protobuf Include="File\Proto\v2\FsTrackPoint.proto" GrpcServices="Client" />
+    <Protobuf Include="File\Proto\v1\FsTrackPoint.proto" GrpcServices="Client" />
+  </ItemGroup>
+
+</Project>
