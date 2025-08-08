@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.30804.86
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36127.28 d17.14
 MinimumVisualStudioVersion = 15.0.26124.0
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FsTrackLog", "FsTrackLog\FsTrackLog.csproj", "{6F8EC081-1DE1-4398-9145-625D87A3A8A6}"
 EndProject
@@ -21,6 +21,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CTrue.FsTrackLog.Core", "CTrue.FsTrackLog.Core\CTrue.FsTrackLog.Core.csproj", "{408408C4-244E-40A2-8C87-C4BF69DF6EE9}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CTrue.FsTrackLog.Contracts", "CTrue.FsTrackLog.Contracts\CTrue.FsTrackLog.Contracts.csproj", "{DD03139D-4B3A-4ECD-B207-55BF70B9BDDC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FsTrackLogToKml", "FsTrackLogToKml\FsTrackLogToKml.csproj", "{A05960F7-EA34-4F84-A2F2-0ACCA74DBDAC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -56,6 +58,10 @@ Global
 		{DD03139D-4B3A-4ECD-B207-55BF70B9BDDC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DD03139D-4B3A-4ECD-B207-55BF70B9BDDC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DD03139D-4B3A-4ECD-B207-55BF70B9BDDC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A05960F7-EA34-4F84-A2F2-0ACCA74DBDAC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A05960F7-EA34-4F84-A2F2-0ACCA74DBDAC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A05960F7-EA34-4F84-A2F2-0ACCA74DBDAC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A05960F7-EA34-4F84-A2F2-0ACCA74DBDAC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
