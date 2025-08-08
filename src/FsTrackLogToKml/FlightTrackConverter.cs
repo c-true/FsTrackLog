@@ -73,10 +73,13 @@ public class FlightTrackConverter
         kml.AppendLine("  <Document>");
         kml.AppendLine($"    <name>{TrackName}</name>");
         kml.AppendLine($"    <Style id=\"{_trackStyleName}\">");
-        kml.AppendLine("      <LineStyle>");
-        kml.AppendLine($"        <color>{_styleConfig.LineColor}</color>");
-        kml.AppendLine($"        <width>{_styleConfig.LineWidth}</width>");
-        kml.AppendLine("      </LineStyle>");
+        kml.AppendLine("        <LineStyle>");
+        kml.AppendLine($"           <color>{_styleConfig.TrackStyle.LineColor}</color>");
+        kml.AppendLine($"           <width>{_styleConfig.TrackStyle.LineWidth}</width>");
+        kml.AppendLine("        </LineStyle>");
+        kml.AppendLine("        <PolyStyle>");
+        kml.AppendLine($"           <color>{_styleConfig.TrackStyle.PolyStyle}</color>");
+        kml.AppendLine("        </PolyStyle>");
         kml.AppendLine("    </Style>");
         kml.AppendLine("    <Placemark>");
         kml.AppendLine($"      <name>{TrackName}</name>");

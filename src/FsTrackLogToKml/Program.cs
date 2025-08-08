@@ -19,7 +19,9 @@ if (!Directory.Exists(rootPath))
     return;
 }
 
-string baseName = new DirectoryInfo(rootPath).Name;
+TourConfig tourConfig = LoadTourConfig(rootPath);
+
+string baseName = tourConfig.Name;
 string overviewKmlName = $"{baseName}-AllFlights.kml";
 string overviewKmzName = $"{baseName}-AllFlights.kmz";
 string outputFolder = Path.Combine(rootPath, "overview");
@@ -56,12 +58,48 @@ var combined = new StringBuilder();
 combined.AppendLine("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
 combined.AppendLine("<kml xmlns=\"http://www.opengis.net/kml/2.2\" xmlns:gx=\"http://www.google.com/kml/ext/2.2\">");
 combined.AppendLine("<Document>");
-combined.AppendLine($"  <name>{baseName} Overview</name>");
+combined.AppendLine($"  <name>{tourConfig.Title}</name>");
+combined.AppendLine($"  <description>{tourConfig.Description}</description>");
+
+// Style for overall plan
+combined.AppendLine("    <Style id=\"yellowLineGreenPoly0\">");
+combined.AppendLine("       <LineStyle>");
+combined.AppendLine($"        <color>{styleConfig.PlanStyle.LineColor}</color>");
+combined.AppendLine($"        <width>{styleConfig.PlanStyle.LineWidth}</width>");
+combined.AppendLine("       </LineStyle>");
+combined.AppendLine("       <PolyStyle>");
+combined.AppendLine($"           <color>{styleConfig.PlanStyle.PolyStyle}</color>");
+combined.AppendLine("       </PolyStyle>");
+combined.AppendLine("    </Style>");
+
+// Styles for route
+combined.AppendLine("    <Style id=\"RouteMark\">");
+combined.AppendLine("       <LineStyle>");
+combined.AppendLine($"           <color>{styleConfig.RouteStyle.LineColor}</color>");
+combined.AppendLine($"           <width>{styleConfig.RouteStyle.LineWidth}</width>");
+combined.AppendLine("       </LineStyle>");
+combined.AppendLine("       <PolyStyle> ");
+combined.AppendLine($"           <color>{styleConfig.RouteStyle.PolyStyle}</color>");
+combined.AppendLine("       </PolyStyle> ");
+combined.AppendLine("    </Style>");
+combined.AppendLine("    <Style id=\"FixMark\">");
+combined.AppendLine("       <IconStyle>");
+combined.AppendLine("           <Icon>");
+combined.AppendLine("               <href>http://maps.google.com/mapfiles/kml/shapes/triangle.png</href>");
+combined.AppendLine("           </Icon>");
+combined.AppendLine("       </IconStyle>");
+combined.AppendLine("       <color>ffffffff</color>");
+combined.AppendLine("    </Style>");
+
+// Styles for track
 combined.AppendLine("    <Style id=\"defaultStyle\">");
 combined.AppendLine("      <LineStyle>");
-combined.AppendLine($"        <color>{styleConfig.LineColor}</color>");
-combined.AppendLine($"        <width>{styleConfig.LineWidth}</width>");
+combined.AppendLine($"        <color>{styleConfig.TrackStyle.LineColor}</color>");
+combined.AppendLine($"        <width>{styleConfig.TrackStyle.LineWidth}</width>");
 combined.AppendLine("      </LineStyle>");
+combined.AppendLine("      <PolyStyle>");
+combined.AppendLine($"       <color>{styleConfig.TrackStyle.PolyStyle}</color>");
+combined.AppendLine("       </PolyStyle>");
 combined.AppendLine("    </Style>");
 
 foreach (var kvp in allKmlByFolder)
@@ -98,6 +136,32 @@ using (var archive = ZipFile.Open(overviewKmzPath, ZipArchiveMode.Create))
 }
 
 Console.WriteLine($"KMZ created at: {overviewKmzPath}");
+
+TourConfig LoadTourConfig(string baseDir)
+{
+    var configFileName = "tourconfig.json";
+
+    var searchPaths = new[]
+    {
+        Path.Combine(baseDir, "config", configFileName)
+    };
+
+    foreach (var path in searchPaths)
+    {
+        if (File.Exists(path))
+        {
+            try
+            {
+                var json = File.ReadAllText(path);
+                var config = JsonSerializer.Deserialize<TourConfig>(json);
+                if (config != null) return config;
+            }
+            catch { }
+        }
+    }
+
+    return new TourConfig();
+}
 
 KmlStyleConfig LoadKmlStyleConfig(string baseDir)
 {
