@@ -19,8 +19,9 @@ if (!Directory.Exists(rootPath))
     return;
 }
 
-string overviewKmlName = "WT24-AllFlights.kml";
-string overviewKmzName = "WT24-AllFlights.kmz";
+string baseName = new DirectoryInfo(rootPath).Name;
+string overviewKmlName = $"{baseName}-AllFlights.kml";
+string overviewKmzName = $"{baseName}-AllFlights.kmz";
 string outputFolder = Path.Combine(rootPath, "overview");
 Directory.CreateDirectory(outputFolder);
 
@@ -30,6 +31,8 @@ var allFolders = Directory.GetDirectories(rootPath)
 
 var allKmlByFolder = new Dictionary<string, List<string>>();
 
+var styleConfig = LoadKmlStyleConfig(rootPath);
+
 foreach (var folder in allFolders)
 {
     var csvFiles = Directory.GetFiles(folder, "*.csv");
@@ -37,7 +40,7 @@ foreach (var folder in allFolders)
 
     foreach (var csv in csvFiles)
     {
-        var converter = new FlightTrackConverter(csv);
+        var converter = new FlightTrackConverter(csv, "defaultStyle", styleConfig);
         converter.Convert();
         kmlFiles.Add(converter.OutputKmlPath);
     }
@@ -53,7 +56,13 @@ var combined = new StringBuilder();
 combined.AppendLine("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
 combined.AppendLine("<kml xmlns=\"http://www.opengis.net/kml/2.2\" xmlns:gx=\"http://www.google.com/kml/ext/2.2\">");
 combined.AppendLine("<Document>");
-combined.AppendLine("  <name>WT24 Overview</name>");
+combined.AppendLine($"  <name>{baseName} Overview</name>");
+combined.AppendLine("    <Style id=\"defaultStyle\">");
+combined.AppendLine("      <LineStyle>");
+combined.AppendLine($"        <color>{styleConfig.LineColor}</color>");
+combined.AppendLine($"        <width>{styleConfig.LineWidth}</width>");
+combined.AppendLine("      </LineStyle>");
+combined.AppendLine("    </Style>");
 
 foreach (var kvp in allKmlByFolder)
 {
@@ -89,3 +98,29 @@ using (var archive = ZipFile.Open(overviewKmzPath, ZipArchiveMode.Create))
 }
 
 Console.WriteLine($"KMZ created at: {overviewKmzPath}");
+
+KmlStyleConfig LoadKmlStyleConfig(string baseDir)
+{
+    var configFileName = "kmlconfig.json";
+
+    var searchPaths = new[]
+    {
+        Path.Combine(baseDir, "config", configFileName)
+    };
+
+    foreach (var path in searchPaths)
+    {
+        if (File.Exists(path))
+        {
+            try
+            {
+                var json = File.ReadAllText(path);
+                var config = JsonSerializer.Deserialize<KmlStyleConfig>(json);
+                if (config != null) return config;
+            }
+            catch { }
+        }
+    }
+
+    return new KmlStyleConfig();
+}

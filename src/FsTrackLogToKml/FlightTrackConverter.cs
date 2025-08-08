@@ -6,13 +6,16 @@ namespace FsTrackLogToKml;
 
 public class FlightTrackConverter
 {
+    private readonly string _trackStyleName;
+    private readonly KmlStyleConfig _styleConfig;
     public string CsvPath { get; }
     public string TrackName { get; }
     public string OutputKmlPath { get; }
-    public KmlStyleConfig StyleConfig { get; }
 
-    public FlightTrackConverter(string csvPath)
+    public FlightTrackConverter(string csvPath, string trackStyleName, KmlStyleConfig styleConfig)
     {
+        _trackStyleName = trackStyleName;
+        _styleConfig = styleConfig;
         CsvPath = Path.GetFullPath(csvPath);
 
         var folder = Path.GetFileName(Path.GetDirectoryName(CsvPath)) ?? "Unknown";
@@ -23,8 +26,6 @@ public class FlightTrackConverter
 
         TrackName = $"{folder}-{fromIcao}-{toIcao}";
         OutputKmlPath = Path.Combine(Path.GetDirectoryName(CsvPath)!, $"{TrackName}.kml");
-
-        StyleConfig = LoadKmlStyleConfig(CsvPath);
     }
 
     public void Convert()
@@ -71,15 +72,15 @@ public class FlightTrackConverter
         kml.AppendLine("<kml xmlns=\"http://www.opengis.net/kml/2.2\" xmlns:gx=\"http://www.google.com/kml/ext/2.2\">");
         kml.AppendLine("  <Document>");
         kml.AppendLine($"    <name>{TrackName}</name>");
-        kml.AppendLine("    <Style id=\"defaultStyle\">");
+        kml.AppendLine($"    <Style id=\"{_trackStyleName}\">");
         kml.AppendLine("      <LineStyle>");
-        kml.AppendLine($"        <color>{StyleConfig.LineColor}</color>");
-        kml.AppendLine($"        <width>{StyleConfig.LineWidth}</width>");
+        kml.AppendLine($"        <color>{_styleConfig.LineColor}</color>");
+        kml.AppendLine($"        <width>{_styleConfig.LineWidth}</width>");
         kml.AppendLine("      </LineStyle>");
         kml.AppendLine("    </Style>");
         kml.AppendLine("    <Placemark>");
         kml.AppendLine($"      <name>{TrackName}</name>");
-        kml.AppendLine("      <styleUrl>#defaultStyle</styleUrl>");
+        kml.AppendLine($"      <styleUrl>#{_trackStyleName}</styleUrl>");
         kml.AppendLine("      <gx:Track>");
         kml.AppendLine("        <altitudeMode>absolute</altitudeMode>");
         for (int i = 0; i < times.Count; i++) kml.AppendLine($"        <when>{times[i]}</when>");
@@ -92,35 +93,5 @@ public class FlightTrackConverter
 
         File.WriteAllText(OutputKmlPath, kml.ToString());
         Console.WriteLine($"Generated: {OutputKmlPath}");
-    }
-
-    private static KmlStyleConfig LoadKmlStyleConfig(string csvPath)
-    {
-        var configFileName = "kmlconfig.json";
-        var baseDir = Path.GetDirectoryName(csvPath)!;
-        var parentDir = Directory.GetParent(baseDir)?.FullName;
-
-        var searchPaths = new[]
-        {
-            Path.Combine(baseDir, configFileName),
-            Path.Combine(parentDir ?? "", configFileName),
-            Path.Combine(parentDir ?? "", "kmlconfig", configFileName)
-        };
-
-        foreach (var path in searchPaths)
-        {
-            if (File.Exists(path))
-            {
-                try
-                {
-                    var json = File.ReadAllText(path);
-                    var config = JsonSerializer.Deserialize<KmlStyleConfig>(json);
-                    if (config != null) return config;
-                }
-                catch { }
-            }
-        }
-
-        return new KmlStyleConfig();
     }
 }
