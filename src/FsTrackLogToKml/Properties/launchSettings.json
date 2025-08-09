@@ -2,7 +2,7 @@
   "profiles": {
     "FsTrackLogToKml": {
       "commandName": "Project",
-      "commandLineArgs": "\"C:\\Users\\tihe\\OneDrive\\FlightSim\\Tour\\WT24Test\""
+      "commandLineArgs": "\"C:\\Users\\tihe\\OneDrive\\FlightSim\\Tour\\WT24\""
     }
   }
 }

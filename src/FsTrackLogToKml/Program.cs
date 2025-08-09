@@ -102,22 +102,23 @@ combined.AppendLine($"       <color>{styleConfig.TrackStyle.PolyStyle}</color>")
 combined.AppendLine("       </PolyStyle>");
 combined.AppendLine("    </Style>");
 
-foreach (var kvp in allKmlByFolder)
-{
-    combined.AppendLine($"  <Folder><name>{kvp.Key}</name>");
-    foreach (var kmlFile in kvp.Value)
-    {
-        var content = File.ReadAllText(kmlFile);
-        var start = content.IndexOf("<Placemark");
-        var end = content.LastIndexOf("</Placemark>");
-        if (start != -1 && end != -1)
-        {
-            var placemark = content.Substring(start, end - start + "</Placemark>".Length);
-            combined.AppendLine(placemark);
-        }
-    }
-    combined.AppendLine("  </Folder>");
-}
+// Plans
+var allPlanKmlFiles = new Dictionary<string, List<string>>();
+string plansFolder = Path.Combine(rootPath, "Plans");
+var planFiles = Directory.GetFiles(plansFolder, "*.kml");
+
+allPlanKmlFiles["Plans"] = planFiles.ToList();
+
+AddKmlFilesAsFolders(allPlanKmlFiles, combined);
+
+combined.AppendLine($"  <Folder><name>Routes</name>");
+combined.AppendLine("  </Folder>");
+
+combined.AppendLine($"  <Folder><name>Tracks</name>");
+
+AddKmlFilesAsFolders(allKmlByFolder, combined);
+
+combined.AppendLine("  </Folder>");
 
 combined.AppendLine("</Document>");
 combined.AppendLine("</kml>");
@@ -137,7 +138,43 @@ using (var archive = ZipFile.Open(overviewKmzPath, ZipArchiveMode.Create))
 
 Console.WriteLine($"KMZ created at: {overviewKmzPath}");
 
-TourConfig LoadTourConfig(string baseDir)
+static void AddKmlFiles(Dictionary<string, string> kmlFiles, StringBuilder kml)
+{
+    foreach (var kvp in kmlFiles)
+    {
+        kml.AppendLine($"  <Folder><name>{kvp.Key}</name>");
+        AppendKmlFileAsPlacemark(kvp.Value, kml);
+        kml.AppendLine("  </Folder>");
+    }
+}
+
+static void AddKmlFilesAsFolders(Dictionary<string, List<string>> kmlFiles, StringBuilder kml)
+{
+    foreach (var kvp in kmlFiles)
+    {
+        kml.AppendLine($"  <Folder><name>{kvp.Key}</name>");
+        foreach (var kmlFile in kvp.Value)
+        {
+            AppendKmlFileAsPlacemark(kmlFile, kml);
+        }
+        kml.AppendLine("  </Folder>");
+    }
+}
+
+// Extracts the Placement element of a KML file
+static void AppendKmlFileAsPlacemark(string kmlFile, StringBuilder kml)
+{
+    var content = File.ReadAllText(kmlFile);
+    var start = content.IndexOf("<Placemark");
+    var end = content.LastIndexOf("</Placemark>");
+    if (start != -1 && end != -1)
+    {
+        var placemark = content.Substring(start, end - start + "</Placemark>".Length);
+        kml.AppendLine(placemark);
+    }
+}
+
+static TourConfig LoadTourConfig(string baseDir)
 {
     var configFileName = "tourconfig.json";
 
@@ -163,7 +200,7 @@ TourConfig LoadTourConfig(string baseDir)
     return new TourConfig();
 }
 
-KmlStyleConfig LoadKmlStyleConfig(string baseDir)
+static KmlStyleConfig LoadKmlStyleConfig(string baseDir)
 {
     var configFileName = "kmlconfig.json";
 
