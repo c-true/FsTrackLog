@@ -7,15 +7,15 @@ namespace FsTrackLogToKml;
 public class FlightTrackConverter
 {
     private readonly string _trackStyleName;
-    private readonly KmlStyleConfig _styleConfig;
+    private readonly TrackStyle _trackStyle;
     public string CsvPath { get; }
     public string TrackName { get; }
     public string OutputKmlPath { get; }
 
-    public FlightTrackConverter(string csvPath, string trackStyleName, KmlStyleConfig styleConfig)
+    public FlightTrackConverter(GeneratorSettings settings, string csvPath)
     {
-        _trackStyleName = trackStyleName;
-        _styleConfig = styleConfig;
+        _trackStyleName = settings.StyleConfig.TrackStyle.StyleName;
+        _trackStyle = settings.StyleConfig.TrackStyle;
         CsvPath = Path.GetFullPath(csvPath);
 
         var folder = Path.GetFileName(Path.GetDirectoryName(CsvPath)) ?? "Unknown";
@@ -24,8 +24,14 @@ public class FlightTrackConverter
         var fromIcao = parts.Length > 0 ? parts[0] : "XXXX";
         var toIcao = parts.Length > 1 ? parts[1] : "XXXX";
 
-        TrackName = $"{folder}-{fromIcao}-{toIcao}";
-        OutputKmlPath = Path.Combine(Path.GetDirectoryName(CsvPath)!, $"{TrackName}.kml");
+        TrackName = $"{folder}-{fromIcao}-{toIcao}"; 
+        OutputKmlPath = Path.Combine(settings.WorkFolder!, $"{fileName}.kml");
+        
+        if(File.Exists(OutputKmlPath))
+        {
+            Console.WriteLine("Deleting existing converted track log: " + fileName);
+            File.Delete(OutputKmlPath);
+        }
     }
 
     public void Convert()
@@ -74,11 +80,11 @@ public class FlightTrackConverter
         kml.AppendLine($"    <name>{TrackName}</name>");
         kml.AppendLine($"    <Style id=\"{_trackStyleName}\">");
         kml.AppendLine("        <LineStyle>");
-        kml.AppendLine($"           <color>{_styleConfig.TrackStyle.LineColor}</color>");
-        kml.AppendLine($"           <width>{_styleConfig.TrackStyle.LineWidth}</width>");
+        kml.AppendLine($"           <color>{_trackStyle.LineColor}</color>");
+        kml.AppendLine($"           <width>{_trackStyle.LineWidth}</width>");
         kml.AppendLine("        </LineStyle>");
         kml.AppendLine("        <PolyStyle>");
-        kml.AppendLine($"           <color>{_styleConfig.TrackStyle.PolyStyle}</color>");
+        kml.AppendLine($"           <color>{_trackStyle.PolyStyle}</color>");
         kml.AppendLine("        </PolyStyle>");
         kml.AppendLine("    </Style>");
         kml.AppendLine("    <Placemark>");

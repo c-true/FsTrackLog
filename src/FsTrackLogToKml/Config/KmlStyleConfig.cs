@@ -23,6 +23,7 @@ public class RouteStyle
 
 public class TrackStyle
 {
+    public string StyleName = "defaultStyle";
     public string LineColor { get; set; } = "ff00ff00";
     public int LineWidth { get; set; } = 4;
     public string PolyStyle { get; set; } = "7f00ff00";

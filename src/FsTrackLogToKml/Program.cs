@@ -1,6 +1,4 @@
-﻿using System.Globalization;
-using System.Reflection;
-using System.Text;
+﻿using System.Text;
 using System.Text.Json;
 using FsTrackLogToKml;
 
@@ -19,38 +17,47 @@ if (!Directory.Exists(rootPath))
     return;
 }
 
-TourConfig tourConfig = LoadTourConfig(rootPath);
+GeneratorSettings settings = new GeneratorSettings();
+settings.BaseDir = rootPath;
+settings.WorkFolder = Directory.CreateTempSubdirectory("fskml_").FullName;
 
-string baseName = tourConfig.Name;
+Console.WriteLine($"Work folder: {settings.WorkFolder}");
+
+settings.TourConfig = LoadTourConfig(rootPath);
+settings.StyleConfig = LoadKmlStyleConfig(rootPath);
+
+string baseName = settings.TourConfig.Name;
 string overviewKmlName = $"{baseName}-AllFlights.kml";
 string overviewKmzName = $"{baseName}-AllFlights.kmz";
-string outputFolder = Path.Combine(rootPath, "overview");
+string outputFolder = Path.Combine(settings.WorkFolder, "overview");
 Directory.CreateDirectory(outputFolder);
+
+var allRouteKmlByFolder = new Dictionary<string, List<string>>();
+var allTrackKmlByFolder = new Dictionary<string, List<string>>();
 
 var allFolders = Directory.GetDirectories(rootPath)
     .Where(d => Path.GetFileName(d)?.StartsWith("WT24-") == true)
     .ToList();
 
-var allKmlByFolder = new Dictionary<string, List<string>>();
-
-var styleConfig = LoadKmlStyleConfig(rootPath);
-
 foreach (var folder in allFolders)
 {
+    // Routes
+    // Also include any manually placed KMLs
+    var routeKmlFiles = Directory.GetFiles(folder, "*.kml");
+    allRouteKmlByFolder[Path.GetFileName(folder)!] = routeKmlFiles.ToList();
+
+    // Tracks
     var csvFiles = Directory.GetFiles(folder, "*.csv");
-    var kmlFiles = new List<string>();
+    var trackKmlFiles = new List<string>();
 
     foreach (var csv in csvFiles)
     {
-        var converter = new FlightTrackConverter(csv, "defaultStyle", styleConfig);
+        var converter = new FlightTrackConverter(settings, csv);
         converter.Convert();
-        kmlFiles.Add(converter.OutputKmlPath);
+        trackKmlFiles.Add(converter.OutputKmlPath);
     }
 
-    // Also include any manually placed KMLs
-    kmlFiles.AddRange(Directory.GetFiles(folder, "*.kml").Where(k => !kmlFiles.Contains(k)));
-
-    allKmlByFolder[Path.GetFileName(folder)!] = kmlFiles;
+    allTrackKmlByFolder[Path.GetFileName(folder)!] = trackKmlFiles;
 }
 
 // Generate the aggregated KML
@@ -58,28 +65,28 @@ var combined = new StringBuilder();
 combined.AppendLine("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
 combined.AppendLine("<kml xmlns=\"http://www.opengis.net/kml/2.2\" xmlns:gx=\"http://www.google.com/kml/ext/2.2\">");
 combined.AppendLine("<Document>");
-combined.AppendLine($"  <name>{tourConfig.Title}</name>");
-combined.AppendLine($"  <description>{tourConfig.Description}</description>");
+combined.AppendLine($"  <name>{settings.TourConfig.Title}</name>");
+combined.AppendLine($"  <description>{settings.TourConfig.Description}</description>");
 
 // Style for overall plan
 combined.AppendLine("    <Style id=\"yellowLineGreenPoly0\">");
 combined.AppendLine("       <LineStyle>");
-combined.AppendLine($"        <color>{styleConfig.PlanStyle.LineColor}</color>");
-combined.AppendLine($"        <width>{styleConfig.PlanStyle.LineWidth}</width>");
+combined.AppendLine($"        <color>{settings.StyleConfig.PlanStyle.LineColor}</color>");
+combined.AppendLine($"        <width>{settings.StyleConfig.PlanStyle.LineWidth}</width>");
 combined.AppendLine("       </LineStyle>");
 combined.AppendLine("       <PolyStyle>");
-combined.AppendLine($"           <color>{styleConfig.PlanStyle.PolyStyle}</color>");
+combined.AppendLine($"           <color>{settings.StyleConfig.PlanStyle.PolyStyle}</color>");
 combined.AppendLine("       </PolyStyle>");
 combined.AppendLine("    </Style>");
 
 // Styles for route
 combined.AppendLine("    <Style id=\"RouteMark\">");
 combined.AppendLine("       <LineStyle>");
-combined.AppendLine($"           <color>{styleConfig.RouteStyle.LineColor}</color>");
-combined.AppendLine($"           <width>{styleConfig.RouteStyle.LineWidth}</width>");
+combined.AppendLine($"           <color>{settings.StyleConfig.RouteStyle.LineColor}</color>");
+combined.AppendLine($"           <width>{settings.StyleConfig.RouteStyle.LineWidth}</width>");
 combined.AppendLine("       </LineStyle>");
 combined.AppendLine("       <PolyStyle> ");
-combined.AppendLine($"           <color>{styleConfig.RouteStyle.PolyStyle}</color>");
+combined.AppendLine($"           <color>{settings.StyleConfig.RouteStyle.PolyStyle}</color>");
 combined.AppendLine("       </PolyStyle> ");
 combined.AppendLine("    </Style>");
 combined.AppendLine("    <Style id=\"FixMark\">");
@@ -94,11 +101,11 @@ combined.AppendLine("    </Style>");
 // Styles for track
 combined.AppendLine("    <Style id=\"defaultStyle\">");
 combined.AppendLine("      <LineStyle>");
-combined.AppendLine($"        <color>{styleConfig.TrackStyle.LineColor}</color>");
-combined.AppendLine($"        <width>{styleConfig.TrackStyle.LineWidth}</width>");
+combined.AppendLine($"        <color>{settings.StyleConfig.TrackStyle.LineColor}</color>");
+combined.AppendLine($"        <width>{settings.StyleConfig.TrackStyle.LineWidth}</width>");
 combined.AppendLine("      </LineStyle>");
 combined.AppendLine("      <PolyStyle>");
-combined.AppendLine($"       <color>{styleConfig.TrackStyle.PolyStyle}</color>");
+combined.AppendLine($"       <color>{settings.StyleConfig.TrackStyle.PolyStyle}</color>");
 combined.AppendLine("       </PolyStyle>");
 combined.AppendLine("    </Style>");
 
@@ -112,11 +119,14 @@ allPlanKmlFiles["Plans"] = planFiles.ToList();
 AddKmlFilesAsFolders(allPlanKmlFiles, combined);
 
 combined.AppendLine($"  <Folder><name>Routes</name>");
+
+AddKmlFilesAsFolders(allRouteKmlByFolder, combined);
+
 combined.AppendLine("  </Folder>");
 
 combined.AppendLine($"  <Folder><name>Tracks</name>");
 
-AddKmlFilesAsFolders(allKmlByFolder, combined);
+AddKmlFilesAsFolders(allTrackKmlByFolder, combined);
 
 combined.AppendLine("  </Folder>");
 
@@ -136,15 +146,30 @@ using (var archive = ZipFile.Open(overviewKmzPath, ZipArchiveMode.Create))
     archive.CreateEntryFromFile(overviewKmlPath, overviewKmlName);
 }
 
+// Copy output files
+string overviewFolder = Path.Combine(settings.BaseDir, "overview");
+
+CopyAllFiles(outputFolder, overviewFolder);
+
+Console.WriteLine("Removing work folder");
+Directory.Delete(settings.WorkFolder, true);
+
 Console.WriteLine($"KMZ created at: {overviewKmzPath}");
 
-static void AddKmlFiles(Dictionary<string, string> kmlFiles, StringBuilder kml)
+static void CopyAllFiles(string sourceFolder, string destinationFolder)
 {
-    foreach (var kvp in kmlFiles)
+    if (!Directory.Exists(sourceFolder))
+        throw new DirectoryNotFoundException($"Source folder not found: {sourceFolder}");
+
+    // Create destination folder if it doesn't exist
+    Directory.CreateDirectory(destinationFolder);
+
+    // Copy each file
+    foreach (string filePath in Directory.GetFiles(sourceFolder))
     {
-        kml.AppendLine($"  <Folder><name>{kvp.Key}</name>");
-        AppendKmlFileAsPlacemark(kvp.Value, kml);
-        kml.AppendLine("  </Folder>");
+        string fileName = Path.GetFileName(filePath);
+        string destPath = Path.Combine(destinationFolder, fileName);
+        File.Copy(filePath, destPath, overwrite: true);
     }
 }
 
