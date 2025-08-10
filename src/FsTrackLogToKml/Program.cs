@@ -6,6 +6,7 @@ using System.IO.Compression;
 
 if (args.Length != 1)
 {
+    Console.WriteLine("FsTrackLogToKml - Converting plans, routes and track logs into a single KML file");
     Console.WriteLine("Usage: FsTrackLogToKml <rootfolder>");
     return;
 }
@@ -13,7 +14,7 @@ if (args.Length != 1)
 var rootPath = args[0];
 if (!Directory.Exists(rootPath))
 {
-    Console.WriteLine($"File not found: {rootPath}");
+    Console.WriteLine($"Folder not found: {rootPath}");
     return;
 }
 
@@ -35,8 +36,8 @@ Directory.CreateDirectory(outputFolder);
 var allRouteKmlByFolder = new Dictionary<string, List<string>>();
 var allTrackKmlByFolder = new Dictionary<string, List<string>>();
 
-var allFolders = Directory.GetDirectories(rootPath)
-    .Where(d => Path.GetFileName(d)?.StartsWith("WT24-") == true)
+string flightsPath = Path.Combine(rootPath, "flights");
+var allFolders = Directory.GetDirectories(flightsPath)
     .ToList();
 
 foreach (var folder in allFolders)

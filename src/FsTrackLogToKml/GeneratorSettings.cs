@@ -12,7 +12,13 @@ public class GeneratorSettings
     /// </summary>
     public string WorkFolder { get; set; }
 
+    /// <summary>
+    /// The current configuration for the tour.
+    /// </summary>
     public TourConfig TourConfig { get; set; }
 
+    /// <summary>
+    /// The current configuration for styles for plans, routes and tracks.
+    /// </summary>
     public KmlStyleConfig StyleConfig { get; set; }
 }

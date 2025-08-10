@@ -89,9 +89,10 @@ public class FlightTrackConverter
         kml.AppendLine("    </Style>");
         kml.AppendLine("    <Placemark>");
         kml.AppendLine($"      <name>{TrackName}</name>");
+        kml.AppendLine($"      <description>{TrackName}</description>");
         kml.AppendLine($"      <styleUrl>#{_trackStyleName}</styleUrl>");
-        kml.AppendLine("      <gx:Track>");
-        kml.AppendLine("        <altitudeMode>absolute</altitudeMode>");
+        kml.AppendLine("       <gx:Track>");
+        kml.AppendLine("         <altitudeMode>absolute</altitudeMode>");
         for (int i = 0; i < times.Count; i++) kml.AppendLine($"        <when>{times[i]}</when>");
         for (int i = 0; i < coords.Count; i++) kml.AppendLine($"        <gx:coord>{coords[i]}</gx:coord>");
         for (int i = 0; i < angles.Count; i++) kml.AppendLine($"        <gx:angles>{angles[i]}</gx:angles>");
@@ -101,6 +102,12 @@ public class FlightTrackConverter
         kml.AppendLine("</kml>");
 
         File.WriteAllText(OutputKmlPath, kml.ToString());
-        Console.WriteLine($"Generated: {OutputKmlPath}");
+
+        int lineCount = lines.Length - 1;
+        string status = "Ok";
+        if (times.Count != lineCount || coords.Count != lineCount || angles.Count != lineCount)
+            status = "Mismatch in data points";
+
+        Console.WriteLine($"{TrackName} - Points: {lineCount} - {status}");
     }
 }
